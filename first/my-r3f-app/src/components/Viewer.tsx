@@ -14,6 +14,7 @@ function Model({ url }: { url: string }) {
 function ModelViewer() {
   //the sphere
   const [ballPosition, setBallPosition] = useState<[number, number, number]>([0, 0, 0]);
+  const [selectedBall, setSelectedBall] = useState<boolean>(false);
 
   //moving the sphere
   const moveBall = (direction: 'left' | 'right' | 'up' | 'down' | 'forward' | 'backward') => {
@@ -47,15 +48,7 @@ function ModelViewer() {
 
   return (
     <div>
-      <div style={{ marginBottom: '20px' }}>
-        <button onClick={() => moveBall('left')}>Left</button>
-        <button onClick={() => moveBall('right')}>Right</button>
-        <button onClick={() => moveBall('up')}>Up</button>
-        <button onClick={() => moveBall('down')}>Down</button>
-        <button onClick={() => moveBall('forward')}>Forward</button>
-        <button onClick={() => moveBall('backward')}>Backward</button>
-      </div>
-
+     
       <div style={{ marginBottom: '20px' }}>
         <button onClick={() => setModelUrl('/models/1221shanghai.glb')}>Shanghai</button>
         <button onClick={() => setModelUrl('/models/roomscan_1104.gltf')}>BK</button>
@@ -68,10 +61,14 @@ function ModelViewer() {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         {modelUrl && <Model url={modelUrl} />}
-        <OrbitControls />
+        {!selectedBall && <OrbitControls />}
 
-        <Sphere position={ballPosition} /> 
-        <axesHelper args={[5]} />
+        <Sphere 
+          position={ballPosition} 
+          isSelected={selectedBall} 
+          onSelect={() => setSelectedBall(!selectedBall)} // 切换选中状态
+        />
+        {/* <axesHelper args={[5]} /> */}
 
       </Canvas>
     </div>
