@@ -1,34 +1,44 @@
-import React, { useRef, useState } from 'react';
-import { Mesh } from 'three';
-import { useFrame } from '@react-three/fiber';
-import { TransformControls } from '@react-three/drei';
+import React, { useRef, useState } from "react";
+import { Group } from "three";
+import { useGLTF } from "@react-three/drei";
+import { useThree, useFrame } from "@react-three/fiber";
+import { Vector3 } from "three";
 
-function Sphere({ position, isSelected, onSelect }: { 
-  position: [number, number, number]; 
-  isSelected: boolean; 
-  onSelect: () => void; 
-}) {
-  const meshRef = useRef<Mesh>(null);
+function Sphere({ url }: { url: string }) {
+  const { scene } = useGLTF(url);
+  const groupRef = useRef<Group>(null);
+  const { camera, raycaster, mouse } = useThree();
+  const [dragging, setDragging] = useState(false);
+
+  useFrame(() => {
+    if (dragging && groupRef.current) {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(groupRef.current, true);
+      if (intersects.length > 0) {
+        const point = intersects[0].point;
+        groupRef.current.position.lerp(
+          new Vector3(point.x, point.y, groupRef.current.position.z),
+          0.2
+        );
+      }
+    }
+  });
 
   return (
-    <>
-      <mesh 
-        ref={meshRef} 
-        position={position} 
-        onClick={onSelect} //select the sphere
-      >
-        <sphereGeometry args={[0.1, 32, 32]} />
-        <meshStandardMaterial color={isSelected ? 'hotpink' : 'blue'} />
-      </mesh>
-
-      
-      {isSelected && (
-        <>
-       
-          <TransformControls object={meshRef.current!} mode="translate" /> 
-        </>
-      )}
-    </>
+    <group
+      ref={groupRef}
+      onPointerDown={() => setDragging(true)}
+      onPointerUp={() => setDragging(false)}
+      onPointerOut={() => setDragging(false)}
+    >
+      <primitive
+        object={scene}
+        scale={[0.06, 0.06, 0.06]}
+        receiveShadow
+        castShadow
+      />
+      <pointLight position={[0, 0, 0.5]} intensity={15.0} color="red" />
+    </group>
   );
 }
 
