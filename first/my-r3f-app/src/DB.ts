@@ -2,13 +2,16 @@ import { openDB } from "idb";
 
 const DB_NAME = "3DScenesDB";
 const SCENES_STORE = "scenes";
-
+const MODELS_STORE = "models";
 // Initialize IndexedDB
 async function initDB() {
-  return await openDB(DB_NAME, 1, {
+  return await openDB(DB_NAME, 2, {
     upgrade(db) {
       if (!db.objectStoreNames.contains(SCENES_STORE)) {
         db.createObjectStore(SCENES_STORE, { keyPath: "id" });
+      }
+      if (!db.objectStoreNames.contains(MODELS_STORE)) {
+        db.createObjectStore(MODELS_STORE, { keyPath: "sceneId" });
       }
     },
   });
@@ -39,3 +42,34 @@ export async function deleteScene(sceneId: string) {
   }
 
 
+//   // Delete a scene safely (Check if the store exists before deleting)
+// export async function deleteScene(sceneId: string) {
+//     const db = await initDB();
+    
+//     const tx = db.transaction([SCENES_STORE, MODELS_STORE], "readwrite");
+  
+//     // Ensure "scenes" store exists before deleting
+//     if (db.objectStoreNames.contains(SCENES_STORE)) {
+//       await tx.objectStore(SCENES_STORE).delete(sceneId);
+//     }
+  
+//     // Ensure "models" store exists before deleting (prevents NotFoundError)
+//     if (db.objectStoreNames.contains(MODELS_STORE)) {
+//       await tx.objectStore(MODELS_STORE).delete(sceneId);
+//     }
+  
+//     await tx.done;
+//   }
+
+// Save a model file to IndexedDB
+export async function saveModel(sceneId: string, file: File) {
+    const db = await initDB();
+    const arrayBuffer = await file.arrayBuffer(); // Convert file to binary
+    await db.put(MODELS_STORE, { sceneId, model: arrayBuffer, name: file.name });
+  }
+  
+  // Get a model by Scene ID
+  export async function getModel(sceneId: string) {
+    const db = await initDB();
+    return await db.get(MODELS_STORE, sceneId);
+  }
