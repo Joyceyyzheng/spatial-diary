@@ -64,6 +64,12 @@ export async function deleteScene(sceneId: string) {
 // Save a model file to IndexedDB
 export async function saveModel(sceneId: string, file: File) {
     const db = await initDB();
+  
+    if (!db.objectStoreNames.contains(MODELS_STORE)) {
+      console.error("Error: 'models' store does not exist.");
+      return;
+    }
+  
     const arrayBuffer = await file.arrayBuffer(); // Convert file to binary
     await db.put(MODELS_STORE, { sceneId, model: arrayBuffer, name: file.name });
   }
@@ -71,5 +77,7 @@ export async function saveModel(sceneId: string, file: File) {
   // Get a model by Scene ID
   export async function getModel(sceneId: string) {
     const db = await initDB();
-    return await db.get(MODELS_STORE, sceneId);
+    const modelData = await db.get(MODELS_STORE, sceneId);
+    console.log("Retrieved model data:", modelData); 
+    return modelData;
   }

@@ -1,22 +1,40 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { saveScene, getSceneById, saveModel, getModel } from "../DB";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree, useLoader } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
+import { GLTF } from "three-stdlib";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
+function ModelRenderer({ url }: { url: string }) {
+  const { scene } = useGLTF(url);
+  return <primitive object={scene} />;
+}
 
 function ModelViewer({ fileData }: { fileData: ArrayBuffer | null }) {
-  if (!fileData) return <p>No model loaded</p>;
+  const [modelUrl, setModelUrl] = useState<string | null>(null);
 
-  // Convert binary data to URL
-  const blob = new Blob([fileData], { type: "model/gltf-binary" });
-  const url = URL.createObjectURL(blob);
-  const { scene } = useGLTF(url);
+  useEffect(() => {
+    if (!fileData) return;
+
+    console.log("Model data found, creating Blob...");
+
+    try {
+      const blob = new Blob([fileData], { type: "model/gltf-binary" });
+      const url = URL.createObjectURL(blob);
+      setModelUrl(url);
+    } catch (error) {
+      console.error("Error creating model URL:", error);
+    }
+  }, [fileData]);
+
+  if (!modelUrl) return <p>Loading model...</p>;
 
   return (
     <Canvas style={{ width: "90vw", height: "80vh" }}>
       <ambientLight intensity={0.5} />
       <OrbitControls />
-      <primitive object={scene} />
+      <ModelRenderer url={modelUrl} />
     </Canvas>
   );
 }
