@@ -81,3 +81,16 @@ export async function saveModel(sceneId: string, file: File) {
     console.log("Retrieved model data:", modelData); 
     return modelData;
   }
+
+//sticky notes
+  export async function saveStickyNotes(sceneId: string, notes: StickyNoteData[]) {
+    const db = await initDB();
+    await db.put("scenes", { id: sceneId, stickyNotes: notes });
+  }
+  
+  export async function getStickyNotes(sceneId: string) {
+    const db = await initDB();
+    const sceneData = await db.get("scenes", sceneId);
+    return sceneData?.stickyNotes || [];
+  }
+  
