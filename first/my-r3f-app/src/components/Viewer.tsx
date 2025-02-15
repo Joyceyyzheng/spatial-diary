@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Canvas, group } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import Sphere from "./Sphere";
-// import { Group } from 'three/examples/jsm/libs/tween.module.js';
+import { Group } from "three";
 
 function Model({ url }: { url: string }) {
   const { scene } = useGLTF(url) as GLTF;
@@ -12,39 +12,26 @@ function Model({ url }: { url: string }) {
 }
 
 function ModelViewer() {
-  //the sphere
+  const [selectedBall, setSelectedBall] = useState<boolean>(false);
   const [ballPosition, setBallPosition] = useState<[number, number, number]>([
     0, 0, 0,
   ]);
-  const [selectedBall, setSelectedBall] = useState<boolean>(false);
 
-  //moving the sphere
+  // Function to move the sticky note in 3D space
   const moveBall = (
-    direction: "left" | "right" | "up" | "down" | "forward" | "backward"
+    axis: "x" | "y" | "z",
+    direction: "positive" | "negative"
   ) => {
-    const [x, y, z] = ballPosition;
-    switch (direction) {
-      case "left":
-        setBallPosition([x - 0.1, y, z]);
-        break;
-      case "right":
-        setBallPosition([x + 0.1, y, z]);
-        break;
-      case "up":
-        setBallPosition([x, y + 0.1, z]);
-        break;
-      case "down":
-        setBallPosition([x, y - 0.1, z]);
-        break;
-      case "forward":
-        setBallPosition([x, y, z + 0.1]);
-        break;
-      case "backward":
-        setBallPosition([x, y, z - 0.1]);
-        break;
-      default:
-        break;
-    }
+    setBallPosition((prev) => {
+      const step = 0.1; // Movement step size
+      let [x, y, z] = prev;
+
+      if (axis === "x") x += direction === "positive" ? step : -step;
+      if (axis === "y") y += direction === "positive" ? step : -step;
+      if (axis === "z") z += direction === "positive" ? step : -step;
+
+      return [x, y, z];
+    });
   };
 
   //scene loader
@@ -64,6 +51,29 @@ function ModelViewer() {
         </button>
         <button onClick={() => setModelUrl("/models/iris2.gltf")}>Puppy</button>
       </div>
+
+      {/* UI Buttons for Moving in 3D Space */}
+      {selectedBall && (
+        <div
+          style={{
+            marginBottom: "10px",
+            display: "grid",
+            gridTemplateColumns: "repeat(3, auto)",
+            gap: "5px",
+          }}
+        >
+          <button onClick={() => moveBall("x", "negative")}>Left (-X)</button>
+          <button onClick={() => moveBall("x", "positive")}>Right (+X)</button>
+          <button onClick={() => moveBall("y", "positive")}>Up (+Y)</button>
+          <button onClick={() => moveBall("y", "negative")}>Down (-Y)</button>
+          <button onClick={() => moveBall("z", "negative")}>
+            Backward (-Z)
+          </button>
+          <button onClick={() => moveBall("z", "positive")}>
+            Forward (+Z)
+          </button>
+        </div>
+      )}
 
       <Canvas style={{ width: "90vw", height: "80vh" }} shadows>
         <ambientLight intensity={0.5} />
