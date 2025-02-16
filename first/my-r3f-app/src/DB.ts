@@ -3,19 +3,31 @@ import { openDB } from "idb";
 const DB_NAME = "3DScenesDB";
 const SCENES_STORE = "scenes";
 const MODELS_STORE = "models";
+const STICKY_NOTES_STORE = "stickyNotes";
 // Initialize IndexedDB
 async function initDB() {
-  return await openDB(DB_NAME, 2, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains(SCENES_STORE)) {
-        db.createObjectStore(SCENES_STORE, { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains(MODELS_STORE)) {
-        db.createObjectStore(MODELS_STORE, { keyPath: "sceneId" });
-      }
-    },
-  });
-}
+  return await openDB(DB_NAME, 3, {
+    upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
+          
+          if (!db.objectStoreNames.contains(SCENES_STORE)) {
+            db.createObjectStore(SCENES_STORE, { keyPath: "id" });
+          }
+          if (!db.objectStoreNames.contains(MODELS_STORE)) {
+            db.createObjectStore(MODELS_STORE, { keyPath: "sceneId" });
+          }
+        }
+        if (oldVersion < 3) {
+         
+          if (!db.objectStoreNames.contains(STICKY_NOTES_STORE)) {
+            const store = db.createObjectStore(STICKY_NOTES_STORE, { keyPath: "id" });
+            store.createIndex("sceneId_idx", "sceneId");
+
+          }
+        }
+      },
+    });
+  }
 
 // Save a new scene
 export async function saveScene(scene: { id: string; name: string }) {
@@ -83,14 +95,42 @@ export async function saveModel(sceneId: string, file: File) {
   }
 
 //sticky notes
-  export async function saveStickyNotes(sceneId: string, notes: StickyNoteData[]) {
-    const db = await initDB();
-    await db.put("scenes", { id: sceneId, stickyNotes: notes });
-  }
+
+//   export async function saveStickyNotes(sceneId: string, notes: StickyNoteData[]) {
+//     const db = await initDB();
+//     await db.put("scenes", { id: sceneId, stickyNotes: notes });
+//   }
   
-  export async function getStickyNotes(sceneId: string) {
+//   export async function getStickyNotes(sceneId: string) {
+//     const db = await initDB();
+//     const sceneData = await db.get("scenes", sceneId);
+//     return sceneData?.stickyNotes || [];
+//   }
+
+
+
+export interface StickyNoteData {
+  id: string;
+  sceneId: string; 
+  position: [number, number, number]; 
+  content?: string; 
+}
+
+export async function saveStickyNote(note: StickyNoteData) {
     const db = await initDB();
-    const sceneData = await db.get("scenes", sceneId);
-    return sceneData?.stickyNotes || [];
+    await db.put(STICKY_NOTES_STORE, note);
+    console.log("Note saved to DB:", note);
+  }
+
+  export async function getStickyNotesBySceneId(sceneId: string): Promise<StickyNoteData[]> {
+    const db = await initDB();
+    const allNotes = await db.getAll(STICKY_NOTES_STORE);
+    return allNotes.filter((note) => note.sceneId === sceneId);
+    // return await db.getAllFromIndex("stickyNotes", "sceneId", sceneId);
+  }
+
+  export async function deleteStickyNote(noteId: string) {
+    const db = await initDB();
+    await db.delete("stickyNotes", noteId);
   }
   

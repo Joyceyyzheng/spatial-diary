@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import { Group } from "three";
 import { useGLTF } from "@react-three/drei";
 
@@ -20,35 +20,32 @@ interface StickyNoteProps {
   //   ) => void;
 }
 
-const StickyNote = React.memo(
-  ({ id, url, position, isSelected, onSelect, onMove }) => {
-    const { scene } = React.useMemo(() => useGLTF(url), [url]);
-    const groupRef = useRef<Group>(null);
+export default function StickyNote({
+  id,
+  url,
+  position,
+  isSelected,
+  onSelect,
+}: StickyNoteProps) {
+  const gltf = useGLTF(url);
 
-    return (
-      <>
-        <group ref={groupRef} position={position} onClick={onSelect}>
-          <primitive
-            object={scene}
-            scale={[0.06, 0.06, 0.06]}
-            receiveShadow
-            castShadow
-          />
-          <pointLight position={[0, 0, 0.5]} intensity={15.0} color="red" />
-          {isSelected && <meshStandardMaterial color="yellow" />}
-        </group>
-      </>
-    );
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.id === nextProps.id &&
-      prevProps.isSelected === nextProps.isSelected &&
-      prevProps.position[0] === nextProps.position[0] &&
-      prevProps.position[1] === nextProps.position[1] &&
-      prevProps.position[2] === nextProps.position[2]
-    );
-  }
-);
+  const clonedScene = useMemo(() => gltf.scene.clone(), [gltf.scene]);
+  const groupRef = useRef<Group>(null);
 
-export default StickyNote;
+  return (
+    <>
+      <group ref={groupRef} position={position} onClick={onSelect}>
+        <primitive
+          object={clonedScene}
+          scale={[0.06, 0.06, 0.06]}
+          receiveShadow
+          castShadow
+        />
+        <pointLight position={[0, 0, 0.5]} intensity={15.0} color="red" />
+        {isSelected && <meshStandardMaterial color="yellow" />}
+      </group>
+    </>
+  );
+}
+
+// export default StickyNote;

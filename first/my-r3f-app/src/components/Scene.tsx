@@ -5,8 +5,9 @@ import {
   getSceneById,
   saveModel,
   getModel,
-  saveStickyNotes,
-  getStickyNotes,
+  saveStickyNote,
+  getStickyNotesBySceneId,
+  deleteStickyNote,
 } from "../DB";
 import { Canvas, useThree, useLoader } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
@@ -17,7 +18,6 @@ import { v4 as uuidv4 } from "uuid";
 import SceneRenderer from "../components/SceneRenderer";
 
 interface StickyNoteData {
-  //⚠️what's this interface thing
   id: string;
   position: [number, number, number];
 }
@@ -112,17 +112,21 @@ function ScenePage() {
   // load sticky notes from IndexedDB once
   useEffect(() => {
     async function loadStickyNotes() {
-      const storedNotes = await getStickyNotes(sceneId!);
-      stickyNotesRef.current = storedNotes;
-      setStickyNotes([...storedNotes]);
+      const storedNotes = await getStickyNotesBySceneId(sceneId!);
+      //   stickyNotesRef.current = storedNotes;
+      //   setStickyNotes([...storedNotes]);
+      setStickyNotes(storedNotes);
+      console.log("Notes loaded from DB:", storedNotes);
     }
     loadStickyNotes();
   }, [sceneId]);
 
   // Add new sticky note
   const addStickyNote = async () => {
+    //⚠️ give center position instead of random
     const newNote: StickyNoteData = {
       id: uuidv4(),
+      sceneId: sceneId!,
       position: [
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
@@ -130,10 +134,14 @@ function ScenePage() {
       ] as [number, number, number],
     };
 
-    stickyNotesRef.current = [...stickyNotesRef.current, newNote];
+    // stickyNotesRef.current = [...stickyNotesRef.current, newNote];
+    // setStickyNotes([...stickyNotesRef.current]);
 
-    setStickyNotes([...stickyNotesRef.current]);
-    await saveStickyNotes(sceneId!, stickyNotesRef.current);
+    const updatedNotes = [...stickyNotes, newNote];
+    setStickyNotes(updatedNotes);
+
+    await saveStickyNote({ ...newNote, sceneId: sceneId! });
+    // await saveStickyNote(sceneId!, stickyNotesRef.current);
     // Force a re-render of the buttons, NOT the 3D scene
     setSelectedNoteId(newNote.id);
   };
@@ -144,7 +152,7 @@ function ScenePage() {
     axis: "x" | "y" | "z",
     direction: "positive" | "negative"
   ) => {
-    stickyNotesRef.current = stickyNotesRef.current.map((note) =>
+    const updatedNotes = stickyNotes.map((note) =>
       note.id === id
         ? {
             ...note,
@@ -159,26 +167,45 @@ function ScenePage() {
           }
         : note
     );
-    setStickyNotes([...stickyNotesRef.current]);
+    setStickyNotes(updatedNotes);
     // 更新 ref
-    stickyNotesRef.current = stickyNotesRef.current.map((note) =>
-      note.id === id
-        ? {
-            ...note,
-            position: note.position.map((value, index) => {
-              if (
-                (axis === "x" && index === 0) ||
-                (axis === "y" && index === 1) ||
-                (axis === "z" && index === 2)
-              ) {
-                return value + (direction === "positive" ? 0.1 : -0.1);
-              }
-              return value;
-            }) as [number, number, number],
-          }
-        : note
-    );
-    await saveStickyNotes(sceneId!, stickyNotesRef.current);
+    // stickyNotesRef.current = stickyNotesRef.current.map((note) =>
+    //   note.id === id
+    //     ? {
+    //         ...note,
+    //         position: note.position.map((value, index) => {
+    //           if (
+    //             (axis === "x" && index === 0) ||
+    //             (axis === "y" && index === 1) ||
+    //             (axis === "z" && index === 2)
+    //           ) {
+    //             return value + (direction === "positive" ? 0.1 : -0.1);
+    //           }
+    //           return value;
+    //         }) as [number, number, number],
+    //       }
+    //     : note
+    // );
+    const updatedNote = updatedNotes.find((note) => note.id === id);
+    if (updatedNote) {
+      await saveStickyNote({ ...updatedNote, sceneId: sceneId! });
+      console.log("Note position saved:", updatedNote.position);
+    }
+  };
+
+  //delete sticky notes
+  const deleteNote = async (noteId: string) => {
+    await deleteStickyNote(noteId);
+    // setStickyNotes(stickyNotes.filter((note) => note.id !== noteId));
+    // setStickyNotes((prev) => prev.filter((note) => note.id !== noteId));
+
+    const updated = stickyNotes.filter((note) => note.id !== noteId);
+    setStickyNotes(updated);
+    stickyNotesRef.current = updated;
+
+    if (selectedNoteId === noteId) {
+      setSelectedNoteId(null);
+    }
   };
 
   return (
@@ -187,6 +214,14 @@ function ScenePage() {
       <div>
         <h1>Scene {sceneId}</h1>
         <button onClick={addStickyNote}>Add Sticky Note</button>
+        <ul>
+          {stickyNotes.map((note) => (
+            <li key={note.id}>
+              <span>Note {note.id}</span>
+              <button onClick={() => deleteNote(note.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
         <input type="file" accept=".glb,.gltf" onChange={handleFileUpload} />
         {/* Movement Buttons (UI Outside Canvas) */}
         {selectedNoteId && (

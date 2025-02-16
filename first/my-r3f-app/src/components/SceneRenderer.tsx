@@ -29,15 +29,17 @@ const StickyNotesContainer = React.memo(
     return (
       <>
         {notes.map((note) => (
-          <StickyNote
-            key={note.id}
-            id={note.id}
-            url="/models/notes.glb"
-            position={note.position}
-            isSelected={selectedNoteId === note.id}
-            onSelect={() => onSelectNote(note.id)}
-            onMove={onMoveNote}
-          />
+          <group key={note.id} position={note.position}>
+            {" "}
+            <StickyNote
+              id={note.id}
+              url="/models/notes.glb"
+              isSelected={selectedNoteId === note.id}
+              onSelect={() => onSelectNote(note.id)}
+              onMove={onMoveNote}
+            />
+            <axesHelper args={[1]} />
+          </group>
         ))}
       </>
     );
