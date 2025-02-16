@@ -14,6 +14,7 @@ import { GLTF } from "three-stdlib";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import StickyNote from "../components/StickyNote";
 import { v4 as uuidv4 } from "uuid";
+import SceneRenderer from "../components/SceneRenderer";
 
 interface StickyNoteData {
   //⚠️what's this interface thing
@@ -21,10 +22,10 @@ interface StickyNoteData {
   position: [number, number, number];
 }
 
-function ModelRenderer({ url }: { url: string }) {
-  const { scene } = useGLTF(url);
-  return <primitive object={scene} />;
-}
+// function ModelRenderer({ url }: { url: string }) {
+//   const { scene } = useGLTF(url);
+//   return <primitive object={scene} />;
+// }
 
 function ModelViewer({ fileData }: { fileData: ArrayBuffer | null }) {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
@@ -159,6 +160,24 @@ function ScenePage() {
         : note
     );
     setStickyNotes([...stickyNotesRef.current]);
+    // 更新 ref
+    stickyNotesRef.current = stickyNotesRef.current.map((note) =>
+      note.id === id
+        ? {
+            ...note,
+            position: note.position.map((value, index) => {
+              if (
+                (axis === "x" && index === 0) ||
+                (axis === "y" && index === 1) ||
+                (axis === "z" && index === 2)
+              ) {
+                return value + (direction === "positive" ? 0.1 : -0.1);
+              }
+              return value;
+            }) as [number, number, number],
+          }
+        : note
+    );
     await saveStickyNotes(sceneId!, stickyNotesRef.current);
   };
 
@@ -205,10 +224,10 @@ function ScenePage() {
             </button>
           </div>
         )}
-        <Canvas style={{ width: "90vw", height: "60vh" }}>
+        {/* <Canvas style={{ width: "90vw", height: "60vh" }}>
           <ambientLight intensity={0.5} />
           <OrbitControls />
-          {/* Only render ModelRenderer if modelUrl exists */}
+        
           {fileData && (
             <ModelRenderer
               url={URL.createObjectURL(
@@ -216,7 +235,7 @@ function ScenePage() {
               )}
             />
           )}
-          {/* Render all sticky notes */}
+      
           {stickyNotesRef.current.map((note) => (
             <StickyNote
               key={note.id}
@@ -228,7 +247,15 @@ function ScenePage() {
               onMove={moveStickyNote}
             />
           ))}
-        </Canvas>
+        </Canvas> */}
+
+        <SceneRenderer
+          fileData={fileData}
+          stickyNotes={stickyNotes}
+          selectedNoteId={selectedNoteId}
+          onSelectNote={setSelectedNoteId}
+          onMoveNote={moveStickyNote}
+        />
       </div>
       {/* newly added  */}
 

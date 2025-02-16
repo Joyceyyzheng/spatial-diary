@@ -20,54 +20,35 @@ interface StickyNoteProps {
   //   ) => void;
 }
 
-function StickyNote({
-  id,
-  url,
-  position,
-  isSelected,
-  onSelect,
-  onMove,
-}: StickyNoteProps) {
-  const { scene } = useGLTF(url);
-  const groupRef = useRef<Group>(null);
+const StickyNote = React.memo(
+  ({ id, url, position, isSelected, onSelect, onMove }) => {
+    const { scene } = React.useMemo(() => useGLTF(url), [url]);
+    const groupRef = useRef<Group>(null);
 
-  return (
-    <>
-      <group ref={groupRef} position={position} onClick={onSelect}>
-        {/* 3D Sticky Note Model */}
-        <primitive
-          object={scene}
-          scale={[0.06, 0.06, 0.06]}
-          receiveShadow
-          castShadow
-        />
-
-        {/* Light moves with the sticky note */}
-        <pointLight position={[0, 0, 0.5]} intensity={15.0} color="red" />
-
-        {/* Highlight selected note */}
-        {isSelected && <meshStandardMaterial color="yellow" />}
-      </group>
-
-      {/* Movement Buttons (Render outside the 3D Scene)
-      {isSelected && (
-        <div style={{ marginTop: "10px" }}>
-          <button onClick={() => onMove(id, "x", "negative")}>Left (-X)</button>
-          <button onClick={() => onMove(id, "x", "positive")}>
-            Right (+X)
-          </button>
-          <button onClick={() => onMove(id, "y", "positive")}>Up (+Y)</button>
-          <button onClick={() => onMove(id, "y", "negative")}>Down (-Y)</button>
-          <button onClick={() => onMove(id, "z", "negative")}>
-            Backward (-Z)
-          </button>
-          <button onClick={() => onMove(id, "z", "positive")}>
-            Forward (+Z)
-          </button>
-        </div>
-      )} */}
-    </>
-  );
-}
+    return (
+      <>
+        <group ref={groupRef} position={position} onClick={onSelect}>
+          <primitive
+            object={scene}
+            scale={[0.06, 0.06, 0.06]}
+            receiveShadow
+            castShadow
+          />
+          <pointLight position={[0, 0, 0.5]} intensity={15.0} color="red" />
+          {isSelected && <meshStandardMaterial color="yellow" />}
+        </group>
+      </>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.id === nextProps.id &&
+      prevProps.isSelected === nextProps.isSelected &&
+      prevProps.position[0] === nextProps.position[0] &&
+      prevProps.position[1] === nextProps.position[1] &&
+      prevProps.position[2] === nextProps.position[2]
+    );
+  }
+);
 
 export default StickyNote;
