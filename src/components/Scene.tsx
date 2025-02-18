@@ -9,11 +9,7 @@ import {
   getStickyNotesBySceneId,
   deleteStickyNote,
 } from "../DB";
-import { Canvas, useThree, useLoader } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
-import { GLTF } from "three-stdlib";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import StickyNote from "../components/StickyNote";
+
 import { v4 as uuidv4 } from "uuid";
 import SceneRenderer from "../components/SceneRenderer";
 import StickyNoteControls from "../components/StickyNoteControl";

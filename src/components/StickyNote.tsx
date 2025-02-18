@@ -1,7 +1,6 @@
 import React, { useRef, useMemo } from "react";
-import { Group, Mesh } from "three";
-import { useGLTF, Text } from "@react-three/drei";
-import { TextureLoader } from "three";
+import { Group } from "three";
+import { useGLTF } from "@react-three/drei";
 
 interface StickyNoteProps {
   id: string;

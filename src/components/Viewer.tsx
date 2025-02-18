@@ -3,7 +3,6 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import Sphere from "./Sphere";
-import { Group } from "three";
 
 function Model({ url }: { url: string }) {
   const { scene } = useGLTF(url) as GLTF;
