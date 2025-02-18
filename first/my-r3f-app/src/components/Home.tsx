@@ -23,14 +23,18 @@ function Home() {
 
   return (
     <div>
-      <h1>Scenes</h1>
-      <button onClick={() => navigate(`/scene/${Date.now()}`)}>
-        Create New Scene
-      </button>
+      <div style={{}}>
+        {" "}
+        <h1>Spatial Diary</h1>
+        <button onClick={() => navigate(`/scene/${Date.now()}`)}>
+          Create New Scene
+        </button>
+      </div>
+
       <ul>
         {scenes.map((scene) => (
           <li key={scene.id}>
-            {scene.name}{" "}
+            {new Date(parseInt(scene.id)).toLocaleString()} {scene.name}{" "}
             <button onClick={() => navigate(`/scene/${scene.id}`)}>Open</button>
             <button onClick={() => handleDeleteScene(scene.id)}>Delete</button>
           </li>

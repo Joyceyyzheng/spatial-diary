@@ -28,7 +28,12 @@ export default function StickyNote({
 
   return (
     <>
-      <group ref={groupRef} position={position} onClick={onSelect}>
+      <group
+        ref={groupRef}
+        position={position}
+        onClick={onSelect}
+        rotation={[1.5, 0, 0]}
+      >
         <primitive
           object={clonedScene}
           scale={[0.06, 0.06, 0.06]}
@@ -52,8 +57,8 @@ export default function StickyNote({
             <meshBasicMaterial map={new TextureLoader().load(imageUrl)} />
           </mesh>
         )} */}
-        <pointLight position={[0, 0, 0.5]} intensity={15.0} color="red" />
-        {isSelected && <meshStandardMaterial color="yellow" />}
+        <pointLight position={[0, 0, 0.5]} intensity={5.0} color="yellow" />
+        {isSelected && <meshStandardMaterial color="blue" />}
       </group>
     </>
   );

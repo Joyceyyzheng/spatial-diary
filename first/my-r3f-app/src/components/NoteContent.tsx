@@ -31,12 +31,24 @@ const NoteContent: React.FC<NoteContentProps> = ({
     console.log("Entries to render:", entries);
   }, [entries]);
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setImage(imageUrl); // 保存 Data URL
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = async () => {
     if (!content && !image) return;
 
     const newEntry: NoteEntry = {
       content,
-      imageUrl: image ? URL.createObjectURL(image) : "",
+      imageUrl: image,
     };
 
     const updatedEntries = [...entries, newEntry]; // add new entry
@@ -59,11 +71,7 @@ const NoteContent: React.FC<NoteContentProps> = ({
           onChange={(e) => setContent(e.target.value)}
           placeholder="Enter your note content..."
         />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImage(e.target.files?.[0] || null)}
-        />
+        <input type="file" accept="image/*" onChange={handleImageUpload} />
         <button onClick={handleSave}>Save</button>
 
         <div className="note-history">

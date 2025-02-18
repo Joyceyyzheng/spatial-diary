@@ -130,7 +130,7 @@ button:focus-visible,
 }
 
 .note-content-popup {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -139,6 +139,9 @@ button:focus-visible,
   border: 1px solid #ccc;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+
+  width: 500px;
+  height: 75vh;
 }
 
 .note-content-header {
@@ -154,15 +157,18 @@ button:focus-visible,
   gap: 10px;
 }
 
+.note-history {
+  max-height: 15rem;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 textarea {
   width: 100%;
   height: 100px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-.note-content-popup {
-  width: 500px;
-  height: 500px;
 }
