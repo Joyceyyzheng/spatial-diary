@@ -99,6 +99,12 @@ export interface StickyNoteData {
   entries?: NoteEntry[];
 }
 
+  export interface NoteEntry {
+  id: string;
+  content: string;
+  position: [number, number, number];
+}
+
 export async function saveStickyNote(note: StickyNoteData) {
     const db = await initDB();
     await db.put(STICKY_NOTES_STORE, note);

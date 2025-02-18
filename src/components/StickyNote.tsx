@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { Group } from "three";
 import { useGLTF } from "@react-three/drei";
 
