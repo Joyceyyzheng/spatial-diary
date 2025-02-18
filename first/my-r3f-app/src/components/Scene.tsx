@@ -16,44 +16,13 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import StickyNote from "../components/StickyNote";
 import { v4 as uuidv4 } from "uuid";
 import SceneRenderer from "../components/SceneRenderer";
+import StickyNoteControls from "../components/StickyNoteControl";
+import NoteContent from "../components/NoteContent";
 
 interface StickyNoteData {
   id: string;
   position: [number, number, number];
-}
-
-// function ModelRenderer({ url }: { url: string }) {
-//   const { scene } = useGLTF(url);
-//   return <primitive object={scene} />;
-// }
-
-function ModelViewer({ fileData }: { fileData: ArrayBuffer | null }) {
-  const [modelUrl, setModelUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!fileData) return;
-
-    console.log("Model data found, creating Blob...");
-
-    try {
-      const blob = new Blob([fileData], { type: "model/gltf-binary" });
-      const url = URL.createObjectURL(blob);
-      setModelUrl(url);
-    } catch (error) {
-      console.error("Error creating model URL:", error);
-    }
-  }, [fileData]);
-
-  if (!modelUrl) return <p>Loading model...</p>;
-
-  return (
-    <>
-      {" "}
-      <ambientLight intensity={0.5} />
-      <OrbitControls />
-      <ModelRenderer url={modelUrl} />
-    </>
-  );
+  entries?: NoteEntry[];
 }
 
 function ScenePage() {
@@ -82,8 +51,9 @@ function ScenePage() {
     setScene(newScene);
   };
 
-  //3d model
+  //   //3d model
   const [fileData, setFileData] = useState<ArrayBuffer | null>(null);
+  const [fileName, setFileName] = useState<string>("");
 
   useEffect(() => {
     async function loadModel() {
@@ -98,6 +68,7 @@ function ScenePage() {
   ) => {
     const file = event.target.files?.[0];
     if (file) {
+      setFileName(file.name);
       await saveModel(sceneId!, file);
       setFileData(await file.arrayBuffer());
     }
@@ -107,7 +78,8 @@ function ScenePage() {
   const [stickyNotes, setStickyNotes] = useState<StickyNoteData[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   //no re-render
-  const stickyNotesRef = useRef<StickyNoteData[]>([]);
+  //  const stickyNotesRef = useRef<StickyNoteData[]>([]);
+  const [showNoteContent, setShowNoteContent] = useState<boolean>(false);
 
   // load sticky notes from IndexedDB once
   useEffect(() => {
@@ -119,7 +91,7 @@ function ScenePage() {
       console.log("Notes loaded from DB:", storedNotes);
     }
     loadStickyNotes();
-  }, [sceneId]);
+  }, [sceneId, selectedNoteId]);
 
   // Add new sticky note
   const addStickyNote = async () => {
@@ -168,24 +140,7 @@ function ScenePage() {
         : note
     );
     setStickyNotes(updatedNotes);
-    // 更新 ref
-    // stickyNotesRef.current = stickyNotesRef.current.map((note) =>
-    //   note.id === id
-    //     ? {
-    //         ...note,
-    //         position: note.position.map((value, index) => {
-    //           if (
-    //             (axis === "x" && index === 0) ||
-    //             (axis === "y" && index === 1) ||
-    //             (axis === "z" && index === 2)
-    //           ) {
-    //             return value + (direction === "positive" ? 0.1 : -0.1);
-    //           }
-    //           return value;
-    //         }) as [number, number, number],
-    //       }
-    //     : note
-    // );
+
     const updatedNote = updatedNotes.find((note) => note.id === id);
     if (updatedNote) {
       await saveStickyNote({ ...updatedNote, sceneId: sceneId! });
@@ -201,108 +156,106 @@ function ScenePage() {
 
     const updated = stickyNotes.filter((note) => note.id !== noteId);
     setStickyNotes(updated);
-    stickyNotesRef.current = updated;
+    // stickyNotesRef.current = updated;
 
     if (selectedNoteId === noteId) {
       setSelectedNoteId(null);
     }
   };
 
+  const handleNoteContentSave = async (entries: NoteEntry[]) => {
+    const updatedNotes = stickyNotes.map((note) =>
+      note.id === selectedNoteId
+        ? {
+            ...note,
+            entries,
+          }
+        : note
+    );
+    setStickyNotes(updatedNotes);
+
+    const updatedNote = updatedNotes.find((note) => note.id === selectedNoteId);
+    if (updatedNote) {
+      console.log("Saving to DB:", updatedNote);
+      await saveStickyNote({ ...updatedNote, sceneId: sceneId! });
+    }
+  };
+
   return (
     <div>
-      {/* newly added  */}
+      <div className="scene-header">
+        {" "}
+        <input
+          type="text"
+          placeholder="Enter scene name"
+          value={sceneName}
+          onChange={(e) => setSceneName(e.target.value)}
+        />
+        <button onClick={handleSaveScene}>Save Scene</button>
+        <button onClick={() => navigate("/")}>Back to Home</button>
+      </div>
       <div>
-        <h1>Scene {sceneId}</h1>
-        <button onClick={addStickyNote}>Add Sticky Note</button>
-        <ul>
-          {stickyNotes.map((note) => (
-            <li key={note.id}>
-              <span>Note {note.id}</span>
-              <button onClick={() => deleteNote(note.id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-        <input type="file" accept=".glb,.gltf" onChange={handleFileUpload} />
-        {/* Movement Buttons (UI Outside Canvas) */}
+        {/* <h1>Scene {sceneId}</h1> */}
+        <div className="sticky-notes-section">
+          <button onClick={addStickyNote}>Add Sticky Note</button>
+          <ul className="sticky-notes-list">
+            {stickyNotes.map((note) => (
+              <li key={note.id}>
+                <span>Note {note.id}</span>
+                <button onClick={() => deleteNote(note.id)}>Delete</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* <input type="file" accept=".glb,.gltf" onChange={handleFileUpload} /> */}
+        <div className="file-upload-container">
+          <input
+            type="file"
+            accept=".glb,.gltf"
+            onChange={handleFileUpload}
+            id="model-upload"
+            className="hidden-file-input"
+          />
+          <label htmlFor="model-upload" className="custom-file-upload button">
+            Upload 3D Model
+          </label>
+          {fileName && <span className="file-name">{fileName}</span>}
+        </div>
         {selectedNoteId && (
-          <div style={{ marginTop: "10px" }}>
-            <p>Move Selected Note</p>
-            <button
-              onClick={() => moveStickyNote(selectedNoteId, "x", "negative")}
-            >
-              Left (-X)
-            </button>
-            <button
-              onClick={() => moveStickyNote(selectedNoteId, "x", "positive")}
-            >
-              Right (+X)
-            </button>
-            <button
-              onClick={() => moveStickyNote(selectedNoteId, "y", "positive")}
-            >
-              Up (+Y)
-            </button>
-            <button
-              onClick={() => moveStickyNote(selectedNoteId, "y", "negative")}
-            >
-              Down (-Y)
-            </button>
-            <button
-              onClick={() => moveStickyNote(selectedNoteId, "z", "negative")}
-            >
-              Backward (-Z)
-            </button>
-            <button
-              onClick={() => moveStickyNote(selectedNoteId, "z", "positive")}
-            >
-              Forward (+Z)
-            </button>
-          </div>
+          <StickyNoteControls
+            selectedNoteId={selectedNoteId}
+            onMoveNote={moveStickyNote}
+          />
         )}
-        {/* <Canvas style={{ width: "90vw", height: "60vh" }}>
-          <ambientLight intensity={0.5} />
-          <OrbitControls />
-        
-          {fileData && (
-            <ModelRenderer
-              url={URL.createObjectURL(
-                new Blob([fileData], { type: "model/gltf-binary" })
-              )}
-            />
-          )}
-      
-          {stickyNotesRef.current.map((note) => (
-            <StickyNote
-              key={note.id}
-              id={note.id}
-              url="/models/notes.glb"
-              position={note.position}
-              isSelected={selectedNoteId === note.id}
-              onSelect={() => setSelectedNoteId(note.id)}
-              onMove={moveStickyNote}
-            />
-          ))}
-        </Canvas> */}
+
+        {selectedNoteId && showNoteContent && (
+          <NoteContent
+            noteId={selectedNoteId}
+            onClose={() => setShowNoteContent(false)}
+            onSave={handleNoteContentSave}
+            initialEntries={
+              stickyNotes.find((note) => note.id === selectedNoteId)?.entries ||
+              []
+            }
+          />
+        )}
 
         <SceneRenderer
           fileData={fileData}
           stickyNotes={stickyNotes}
           selectedNoteId={selectedNoteId}
-          onSelectNote={setSelectedNoteId}
+          onSelectNote={(noteId) => {
+            if (noteId === selectedNoteId) {
+              setSelectedNoteId(null);
+              setShowNoteContent(true);
+            } else {
+              setSelectedNoteId(noteId);
+            }
+          }}
           onMoveNote={moveStickyNote}
         />
       </div>
-      {/* newly added  */}
-
-      {/* <h1>{scene ? `Edit Scene: ${scene.name}` : "Create New Scene"}</h1> */}
-      <input
-        type="text"
-        placeholder="Enter scene name"
-        value={sceneName}
-        onChange={(e) => setSceneName(e.target.value)}
-      />
-      <button onClick={handleSaveScene}>Save Scene</button>
-      <button onClick={() => navigate("/")}>Back to Home</button>
     </div>
   );
 }

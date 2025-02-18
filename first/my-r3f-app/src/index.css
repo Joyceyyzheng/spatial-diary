@@ -4,13 +4,15 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #dcdcdc;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --default-gray: #f9f9f9;
 }
 
 a {
@@ -35,26 +37,32 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+button,
+.button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: 0.8em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  color: black;
+  background-color: var(--default-gray);
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
+button:hover,
+.button:hover {
   border-color: #646cff;
 }
 button:focus,
-button:focus-visible {
+button:focus-visible,
+.button:focus,
+.button:focus-visible {
+  background-color: #646cff;
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+/* @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
@@ -62,7 +70,99 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  button {
+  button,
+  .button {
     background-color: #f9f9f9;
   }
+} */
+
+.sticky-notes-section {
+  position: absolute;
+  top: 2%;
+  left: 0;
+  /* width: 100%;
+  height: 100%; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1em;
+}
+
+.sticky-notes-list {
+  font-size: 0.8em;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scene-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1em;
+}
+
+.file-upload-container {
+  display: inline-block;
+  margin: 0.5rem;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.custom-file-upload:hover {
+  background: #e9ecef;
+}
+
+.sticky-note-controls {
+  position: absolute;
+  top: 55%;
+  right: 5%;
+  z-index: 1000;
+  background-color: var(--default-gray);
+  padding: 0.5em;
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.note-content-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.note-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.note-content-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.note-content-popup {
+  width: 500px;
+  height: 500px;
 }

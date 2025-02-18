@@ -34,6 +34,8 @@ const StickyNotesContainer = React.memo(
             <StickyNote
               id={note.id}
               url="/models/notes.glb"
+              content={note.content}
+              imageUrl={note.imageUrl}
               isSelected={selectedNoteId === note.id}
               onSelect={() => onSelectNote(note.id)}
               onMove={onMoveNote}
@@ -75,9 +77,9 @@ const SceneRenderer = React.memo(
     }, [fileData]);
 
     return (
-      <Canvas style={{ width: "90vw", height: "60vh" }}>
+      <Canvas style={{ width: "90vw", height: "80vh" }}>
         <ambientLight intensity={0.5} />
-        <OrbitControls />
+        <OrbitControls maxDistance={6} minDistance={0.1} />
         {modelUrl && <ModelRenderer url={modelUrl} />}
         <StickyNotesContainer
           notes={stickyNotes}

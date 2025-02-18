@@ -54,25 +54,6 @@ export async function deleteScene(sceneId: string) {
   }
 
 
-//   // Delete a scene safely (Check if the store exists before deleting)
-// export async function deleteScene(sceneId: string) {
-//     const db = await initDB();
-    
-//     const tx = db.transaction([SCENES_STORE, MODELS_STORE], "readwrite");
-  
-//     // Ensure "scenes" store exists before deleting
-//     if (db.objectStoreNames.contains(SCENES_STORE)) {
-//       await tx.objectStore(SCENES_STORE).delete(sceneId);
-//     }
-  
-//     // Ensure "models" store exists before deleting (prevents NotFoundError)
-//     if (db.objectStoreNames.contains(MODELS_STORE)) {
-//       await tx.objectStore(MODELS_STORE).delete(sceneId);
-//     }
-  
-//     await tx.done;
-//   }
-
 // Save a model file to IndexedDB
 export async function saveModel(sceneId: string, file: File) {
     const db = await initDB();
@@ -114,6 +95,8 @@ export interface StickyNoteData {
   sceneId: string; 
   position: [number, number, number]; 
   content?: string; 
+  imageUrl?: string;
+  entries?: NoteEntry[];
 }
 
 export async function saveStickyNote(note: StickyNoteData) {
