@@ -180,31 +180,6 @@ function ScenePage() {
   return (
     <div>
       <div className="scene-header">
-        {" "}
-        <input
-          type="text"
-          placeholder="Enter scene name"
-          value={sceneName}
-          onChange={(e) => setSceneName(e.target.value)}
-        />
-        <button onClick={handleSaveScene}>Save Scene</button>
-        <button onClick={() => navigate("/")}>Back to Home</button>
-      </div>
-      <div>
-        {/* <h1>Scene {sceneId}</h1> */}
-        <div className="sticky-notes-section">
-          <button onClick={addStickyNote}>Add Sticky Note</button>
-          <ul className="sticky-notes-list">
-            {stickyNotes.map((note) => (
-              <li key={note.id}>
-                <span>Note {note.id}</span>
-                <button onClick={() => deleteNote(note.id)}>Delete</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* <input type="file" accept=".glb,.gltf" onChange={handleFileUpload} /> */}
         <div className="file-upload-container">
           <input
             type="file"
@@ -214,10 +189,38 @@ function ScenePage() {
             className="hidden-file-input"
           />
           <label htmlFor="model-upload" className="custom-file-upload button">
-            Upload 3D Model
+            {fileData ? "Replace 3D Model" : "Upload 3D Model"}
           </label>
           {fileName && <span className="file-name">{fileName}</span>}
+        </div>{" "}
+        <input
+          type="text"
+          placeholder="Enter scene name"
+          value={sceneName}
+          onChange={(e) => setSceneName(e.target.value)}
+        />
+        <button onClick={handleSaveScene}>Save Scene</button>
+        <button className="home-button" onClick={() => navigate("/")}>
+          Back to Home
+        </button>
+      </div>
+      <div>
+        {/* <h1>Scene {sceneId}</h1> */}
+        <div className="sticky-notes-section">
+          <button onClick={addStickyNote}>Add Sticky Note</button>
+          <ul className="sticky-notes-list">
+            {stickyNotes.map((note, index) => (
+              <li key={note.id}>
+                {/* <span>Note {note.id}</span> */}
+                <span>Note {index + 1}</span>
+                <button onClick={() => deleteNote(note.id)}>Delete</button>
+              </li>
+            ))}
+          </ul>
         </div>
+
+        {/* <input type="file" accept=".glb,.gltf" onChange={handleFileUpload} /> */}
+
         {selectedNoteId && (
           <StickyNoteControls
             selectedNoteId={selectedNoteId}

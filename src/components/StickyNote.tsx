@@ -56,7 +56,7 @@ export default function StickyNote({
             <meshBasicMaterial map={new TextureLoader().load(imageUrl)} />
           </mesh>
         )} */}
-        <pointLight position={[0, 0, 0.5]} intensity={5.0} color="yellow" />
+        <pointLight position={[0, 0, 0.5]} intensity={15.0} color="yellow" />
         {isSelected && <meshStandardMaterial color="blue" />}
       </group>
     </>

@@ -27,7 +27,7 @@ function Sphere({
       />
 
       {/* Light moves with the sticky note */}
-      <pointLight position={[0, 0, 0.5]} intensity={10.0} color="yellow" />
+      <pointLight position={[0, 0, 0.5]} intensity={20.0} color="white" />
       {isSelected && <meshStandardMaterial color="blue" />}
     </group>
   );
