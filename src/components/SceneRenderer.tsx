@@ -9,7 +9,7 @@ import { StickyNoteData } from "../types";
 
 const store = createXRStore();
 
-const defaultUrl = "/spatial-diary/models/notes.glb";
+const defaultUrl = "/models/notes.glb";
 
 const ModelRenderer = React.memo(({ url }: { url: string }) => {
   const { scene } = useGLTF(url);

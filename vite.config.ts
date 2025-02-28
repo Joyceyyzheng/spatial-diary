@@ -9,7 +9,6 @@ export default defineConfig({
     host: '0.0.0.0', // This makes it accessible to all devices on your network
     port: 5173,       // Default port, or you can change this
   },
-  base: '/spatial-diary/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
