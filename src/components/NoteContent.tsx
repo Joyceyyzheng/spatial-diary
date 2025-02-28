@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 interface NoteContentProps {
   noteId: string;
@@ -7,6 +8,8 @@ interface NoteContentProps {
   initialEntries?: NoteEntry[];
 }
 interface NoteEntry {
+  id: string;
+  timestamp: number;
   content: string;
   imageUrl?: string;
 }
@@ -31,13 +34,18 @@ const NoteContent: React.FC<NoteContentProps> = ({
     console.log("Entries to render:", entries);
   }, [entries]);
 
+  const handleImageChange = (imageUrl: string) => {
+    setImage(imageUrl);
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
-        setImage(imageUrl); // 保存 Data URL
+        setImage(imageUrl);
+        // handleImageChange(imageUrl);
       };
       reader.readAsDataURL(file);
     }
