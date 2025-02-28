@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 interface NoteContentProps {
   noteId: string;
@@ -7,6 +8,8 @@ interface NoteContentProps {
   initialEntries?: NoteEntry[];
 }
 interface NoteEntry {
+  id: string;
+  timestamp: number;
   content: string;
   imageUrl?: string;
 }

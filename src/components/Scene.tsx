@@ -14,18 +14,14 @@ import { v4 as uuidv4 } from "uuid";
 import SceneRenderer from "../components/SceneRenderer";
 import StickyNoteControls from "../components/StickyNoteControl";
 import NoteContent from "../components/NoteContent";
+import { StickyNoteData, NoteEntry } from "../types";
 
-interface StickyNoteData {
-  id: string;
-  position: [number, number, number];
-  entries?: NoteEntry[];
-}
-
-function ScenePage() {
-  const { sceneId } = useParams(); // Get dynamic route ID
+const ScenePage: React.FC = () => {
+  const { sceneId } = useParams<{ sceneId: string }>(); // Use specific type for useParams
   const navigate = useNavigate();
+
   const [scene, setScene] = useState<{ id: string; name: string } | null>(null);
-  const [sceneName, setSceneName] = useState("");
+  const [sceneName, setSceneName] = useState<string>("");
 
   useEffect(() => {
     async function loadScene() {
@@ -47,13 +43,14 @@ function ScenePage() {
     setScene(newScene);
   };
 
-  //   //3d model
+  // Handle 3D model upload and data
   const [fileData, setFileData] = useState<ArrayBuffer | null>(null);
   const [fileName, setFileName] = useState<string>("");
 
   useEffect(() => {
     async function loadModel() {
-      const storedModel = await getModel(sceneId!);
+      if (!sceneId) return;
+      const storedModel = await getModel(sceneId);
       if (storedModel) setFileData(storedModel.model);
     }
     loadModel();
@@ -70,47 +67,41 @@ function ScenePage() {
     }
   };
 
-  //sticky notes
+  // Sticky Notes functionality
   const [stickyNotes, setStickyNotes] = useState<StickyNoteData[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  //no re-render
-  //  const stickyNotesRef = useRef<StickyNoteData[]>([]);
   const [showNoteContent, setShowNoteContent] = useState<boolean>(false);
 
-  // load sticky notes from IndexedDB once
+  // Load sticky notes from the DB
   useEffect(() => {
     async function loadStickyNotes() {
-      const storedNotes = await getStickyNotesBySceneId(sceneId!);
-      //   stickyNotesRef.current = storedNotes;
-      //   setStickyNotes([...storedNotes]);
-      setStickyNotes(storedNotes);
-      console.log("Notes loaded from DB:", storedNotes);
+      if (sceneId) {
+        const storedNotes = await getStickyNotesBySceneId(sceneId);
+        setStickyNotes(storedNotes);
+        console.log("Notes loaded from DB:", storedNotes);
+      }
     }
     loadStickyNotes();
-  }, [sceneId, selectedNoteId]);
+  }, [sceneId]);
 
   // Add new sticky note
   const addStickyNote = async () => {
-    //⚠️ give center position instead of random
+    if (!sceneId) return;
     const newNote: StickyNoteData = {
       id: uuidv4(),
-      sceneId: sceneId!,
+      sceneId,
       position: [
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
       ] as [number, number, number],
+      entries: [],
     };
-
-    // stickyNotesRef.current = [...stickyNotesRef.current, newNote];
-    // setStickyNotes([...stickyNotesRef.current]);
 
     const updatedNotes = [...stickyNotes, newNote];
     setStickyNotes(updatedNotes);
 
-    await saveStickyNote({ ...newNote, sceneId: sceneId! });
-    // await saveStickyNote(sceneId!, stickyNotesRef.current);
-    // Force a re-render of the buttons, NOT the 3D scene
+    await saveStickyNote({ ...newNote, sceneId: sceneId });
     setSelectedNoteId(newNote.id);
   };
 
@@ -144,16 +135,11 @@ function ScenePage() {
     }
   };
 
-  //delete sticky notes
+  // Delete sticky note
   const deleteNote = async (noteId: string) => {
     await deleteStickyNote(noteId);
-    // setStickyNotes(stickyNotes.filter((note) => note.id !== noteId));
-    // setStickyNotes((prev) => prev.filter((note) => note.id !== noteId));
-
     const updated = stickyNotes.filter((note) => note.id !== noteId);
     setStickyNotes(updated);
-    // stickyNotesRef.current = updated;
-
     if (selectedNoteId === noteId) {
       setSelectedNoteId(null);
     }
@@ -192,7 +178,7 @@ function ScenePage() {
             {fileData ? "Replace 3D Model" : "Upload 3D Model"}
           </label>
           {fileName && <span className="file-name">{fileName}</span>}
-        </div>{" "}
+        </div>
         <input
           type="text"
           placeholder="Enter scene name"
@@ -205,21 +191,17 @@ function ScenePage() {
         </button>
       </div>
       <div>
-        {/* <h1>Scene {sceneId}</h1> */}
         <div className="sticky-notes-section">
           <button onClick={addStickyNote}>Add Sticky Note</button>
           <ul className="sticky-notes-list">
             {stickyNotes.map((note, index) => (
               <li key={note.id}>
-                {/* <span>Note {note.id}</span> */}
                 <span>Note {index + 1}</span>
                 <button onClick={() => deleteNote(note.id)}>Delete</button>
               </li>
             ))}
           </ul>
         </div>
-
-        {/* <input type="file" accept=".glb,.gltf" onChange={handleFileUpload} /> */}
 
         {selectedNoteId && (
           <StickyNoteControls
@@ -257,6 +239,6 @@ function ScenePage() {
       </div>
     </div>
   );
-}
+};
 
 export default ScenePage;
