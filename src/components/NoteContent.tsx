@@ -38,6 +38,18 @@ const NoteContent: React.FC<NoteContentProps> = ({
     setImage(imageUrl);
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        handleImageChange(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = () => {
     onSave([
       {

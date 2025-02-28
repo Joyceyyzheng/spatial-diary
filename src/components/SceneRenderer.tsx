@@ -5,13 +5,20 @@ import StickyNote from "./StickyNote";
 // import ModelRenderer from "./ModelRenderer";
 import { useGLTF } from "@react-three/drei";
 import { XR, createXRStore } from "@react-three/xr";
+import { StickyNoteData } from "../types";
 
 const store = createXRStore();
+
+const defaultUrl = "/spatial-diary/models/notes.glb";
 
 const ModelRenderer = React.memo(({ url }: { url: string }) => {
   const { scene } = useGLTF(url);
   return <primitive object={scene} />;
 });
+
+interface Note extends StickyNoteData {
+  url?: string;
+}
 
 const StickyNotesContainer = React.memo(
   ({
@@ -20,7 +27,7 @@ const StickyNotesContainer = React.memo(
     onSelectNote,
     onMoveNote,
   }: {
-    notes: { id: string; position: [number, number, number] }[];
+    notes: Note[];
     selectedNoteId: string | null;
     onSelectNote: (id: string) => void;
     onMoveNote: (

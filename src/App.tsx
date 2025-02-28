@@ -1,19 +1,23 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Home from "./components/Home";
-import ScenePage from "./components/Scene";
+import Scene from "./components/Scene";
+import Viewer from "./components/Viewer";
 
 function App() {
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/scene/:sceneId" element={<ScenePage />} />
-        </Routes>
-      </Router>
-      {/* <ModelViewer /> */}
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Viewer />} />
+        <Route path="/scene/:sceneId" element={<Scene />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
