@@ -40,9 +40,8 @@ const StickyNotesContainer = React.memo(
             {" "}
             <StickyNote
               id={note.id}
-              url="/models/notes.glb"
-              content={note.content}
-              imageUrl={note.imageUrl}
+              position={note.position}
+              url={note.url || defaultUrl}
               isSelected={selectedNoteId === note.id}
               onSelect={() => onSelectNote(note.id)}
               onMove={onMoveNote}
