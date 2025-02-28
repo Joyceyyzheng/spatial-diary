@@ -5,11 +5,8 @@ import StickyNote from "./StickyNote";
 // import ModelRenderer from "./ModelRenderer";
 import { useGLTF } from "@react-three/drei";
 import { XR, createXRStore } from "@react-three/xr";
-import { StickyNoteData } from "../types";
 
 const store = createXRStore();
-
-const defaultUrl = "/models/notes.glb";
 
 const ModelRenderer = React.memo(({ url }: { url: string }) => {
   const { scene } = useGLTF(url);
@@ -48,7 +45,7 @@ const StickyNotesContainer = React.memo(
               isSelected={selectedNoteId === note.id}
               onSelect={() => onSelectNote(note.id)}
               onMove={onMoveNote}
-              entries={note.entries}
+              // entries={note.entries}
             />
             <axesHelper args={[1]} />
           </group>
