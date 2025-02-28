@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 interface NoteContentProps {
   noteId: string;
@@ -7,6 +8,8 @@ interface NoteContentProps {
   initialEntries?: NoteEntry[];
 }
 interface NoteEntry {
+  id: string;
+  timestamp: number;
   content: string;
   imageUrl?: string;
 }
@@ -17,7 +20,7 @@ const NoteContent: React.FC<NoteContentProps> = ({
   initialEntries = [],
 }) => {
   const [content, setContent] = useState<string>("");
-  const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState<string | undefined>(undefined);
   const [entries, setEntries] = useState<NoteEntry[]>(initialEntries);
 
   useEffect(() => {
@@ -31,31 +34,19 @@ const NoteContent: React.FC<NoteContentProps> = ({
     console.log("Entries to render:", entries);
   }, [entries]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        setImage(imageUrl); // 保存 Data URL
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageChange = (imageUrl: string) => {
+    setImage(imageUrl);
   };
 
-  const handleSave = async () => {
-    if (!content && !image) return;
-
-    const newEntry: NoteEntry = {
-      content,
-      imageUrl: image,
-    };
-
-    const updatedEntries = [...entries, newEntry]; // add new entry
-    setEntries(updatedEntries);
-    onSave(updatedEntries);
-    setContent("");
-    setImage(null);
+  const handleSave = () => {
+    onSave([
+      {
+        id: uuidv4(),
+        timestamp: Date.now(),
+        content,
+        imageUrl: image,
+      },
+    ]);
   };
 
   return (

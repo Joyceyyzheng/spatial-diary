@@ -54,12 +54,19 @@ button:hover,
 .button:hover {
   border-color: #646cff;
 }
-button:focus,
+/* button:focus,
 button:focus-visible,
 .button:focus,
 .button:focus-visible {
   background-color: #646cff;
   outline: 4px auto -webkit-focus-ring-color;
+} */
+
+button:active,
+.button:active {
+  background-color: #646cff;
+  outline: 4px auto -webkit-focus-ring-color;
+  transition: background-color 0.2s ease-in-out;
 }
 
 /* @media (prefers-color-scheme: light) {
@@ -78,7 +85,7 @@ button:focus-visible,
 
 .sticky-notes-section {
   position: absolute;
-  top: 2%;
+  top: 80%;
   left: 0;
   /* width: 100%;
   height: 100%; */
@@ -86,6 +93,8 @@ button:focus-visible,
   justify-content: center;
   align-items: center;
   padding: 0 1em;
+
+  z-index: 1000;
 }
 
 .sticky-notes-list {
@@ -171,4 +180,12 @@ textarea {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+.home-button {
+  z-index: 1000;
+  position: absolute;
+  top: 5%;
+  left: 0%;
+  margin-left: 1em;
 }
