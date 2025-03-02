@@ -10,6 +10,7 @@ export interface StickyNoteData {
   id: string;
   sceneId: string;
   position: [number, number, number];
+  rotation: [number, number, number]; 
   entries?: NoteEntry[];
 }
 

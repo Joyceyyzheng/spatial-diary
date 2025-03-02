@@ -4,7 +4,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -17,11 +16,13 @@
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.18.0",
     "@react-three/xr": "^6.6.6",
+    "@tailwindcss/vite": "^4.0.9",
     "@types/three": "^0.172.0",
     "idb": "^8.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.5",
+    "tailwindcss": "^4.0.9",
     "three": "^0.172.0",
     "uuid": "^11.0.5",
     "zustand": "^5.0.3"

@@ -15,6 +15,7 @@ import SceneRenderer from "../components/SceneRenderer";
 import StickyNoteControls from "../components/StickyNoteControl";
 import NoteContent from "../components/NoteContent";
 import { StickyNoteData, NoteEntry } from "../types";
+import SceneInfo from "./SceneInfo";
 
 const ScenePage: React.FC = () => {
   const { sceneId } = useParams<{ sceneId: string }>(); // Use specific type for useParams
@@ -84,7 +85,7 @@ const ScenePage: React.FC = () => {
     loadStickyNotes();
   }, [sceneId]);
 
-  // Add new sticky note
+  // add new sticky note
   const addStickyNote = async () => {
     if (!sceneId) return;
     const newNote: StickyNoteData = {
@@ -95,6 +96,7 @@ const ScenePage: React.FC = () => {
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
       ] as [number, number, number],
+      rotation: [0, 0, 0] as [number, number, number],
       entries: [],
     };
 
@@ -105,7 +107,7 @@ const ScenePage: React.FC = () => {
     setSelectedNoteId(newNote.id);
   };
 
-  // Move sticky note in 3D space
+  // move sticky note in 3D space
   const moveStickyNote = async (
     id: string,
     axis: "x" | "y" | "z",
@@ -135,7 +137,39 @@ const ScenePage: React.FC = () => {
     }
   };
 
-  // Delete sticky note
+  //rotate sticky note
+  const rotateStickyNote = async (
+    id: string,
+    axis: "x" | "y" | "z",
+    direction: "positive" | "negative"
+  ) => {
+    const rotationAmount =
+      (Math.PI / 32) * (direction === "positive" ? 50 : -50);
+    console.log(rotationAmount);
+
+    const updatedNotes = stickyNotes.map((note) => {
+      if (note.id !== id) return note;
+
+      const currentRotation = note.rotation || [0, 0, 0];
+
+      return {
+        ...note,
+        rotation: [
+          currentRotation[0] + (axis === "x" ? rotationAmount : 0),
+          currentRotation[1] + (axis === "y" ? rotationAmount : 0),
+          currentRotation[2] + (axis === "z" ? rotationAmount : 0),
+        ] as [number, number, number],
+      };
+    });
+    setStickyNotes(updatedNotes);
+
+    const updatedNote = updatedNotes.find((note) => note.id === id);
+    if (updatedNote) {
+      await saveStickyNote({ ...updatedNote, sceneId: sceneId! });
+    }
+  };
+
+  // delete sticky note
   const deleteNote = async (noteId: string) => {
     await deleteStickyNote(noteId);
     const updated = stickyNotes.filter((note) => note.id !== noteId);
@@ -162,6 +196,8 @@ const ScenePage: React.FC = () => {
       await saveStickyNote({ ...updatedNote, sceneId: sceneId! });
     }
   };
+
+  const [showInfo, setShowInfo] = useState(false);
 
   return (
     <div>
@@ -202,11 +238,19 @@ const ScenePage: React.FC = () => {
             ))}
           </ul>
         </div>
+        <button className="scene-info" onClick={() => setShowInfo(true)}>
+          Info
+        </button>
+
+        {showInfo && sceneId && (
+          <SceneInfo sceneId={sceneId} onClose={() => setShowInfo(false)} />
+        )}
 
         {selectedNoteId && (
           <StickyNoteControls
             selectedNoteId={selectedNoteId}
             onMoveNote={moveStickyNote}
+            onRotateNote={rotateStickyNote}
           />
         )}
 
@@ -228,10 +272,11 @@ const ScenePage: React.FC = () => {
           selectedNoteId={selectedNoteId}
           onSelectNote={(noteId) => {
             if (noteId === selectedNoteId) {
-              setSelectedNoteId(null);
+              // setSelectedNoteId(null);
               setShowNoteContent(true);
             } else {
               setSelectedNoteId(noteId);
+              setShowNoteContent(false);
             }
           }}
           onMoveNote={moveStickyNote}

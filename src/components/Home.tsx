@@ -25,18 +25,33 @@ function Home() {
     <div>
       <div style={{}}>
         {" "}
-        <h1>Spatial Diary</h1>
+        <h1 className="my-2">Spatial Diary</h1>
         <button onClick={() => navigate(`/scene/${Date.now()}`)}>
           Create New Scene
         </button>
       </div>
 
-      <ul>
+      <ul className="text-left w-full list-none">
         {scenes.map((scene) => (
-          <li key={scene.id}>
-            {new Date(parseInt(scene.id)).toLocaleString()} {scene.name}{" "}
-            <button onClick={() => navigate(`/scene/${scene.id}`)}>Open</button>
-            <button onClick={() => handleDeleteScene(scene.id)}>Delete</button>
+          <li key={scene.id} className="my-2 flex justify-between items-center">
+            <div className="mx-2">
+              {" "}
+              {new Date(parseInt(scene.id)).toLocaleString()} {scene.name}{" "}
+            </div>
+            <div>
+              <button
+                className="mx-0.5"
+                onClick={() => navigate(`/scene/${scene.id}`)}
+              >
+                Open
+              </button>
+              <button
+                className="mx-0.5"
+                onClick={() => handleDeleteScene(scene.id)}
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>

@@ -36,7 +36,11 @@ const StickyNotesContainer = React.memo(
     return (
       <>
         {notes.map((note) => (
-          <group key={note.id} position={note.position}>
+          <group
+            key={note.id}
+            position={note.position}
+            rotation={note.rotation}
+          >
             {" "}
             <StickyNote
               id={note.id}
@@ -48,7 +52,7 @@ const StickyNotesContainer = React.memo(
               onMove={onMoveNote}
               // entries={note.entries}
             />
-            <axesHelper args={[1]} />
+            {/* <axesHelper args={[1]} /> */}
           </group>
         ))}
       </>

@@ -189,3 +189,9 @@ textarea {
   left: 0%;
   margin-left: 1em;
 }
+
+.scene-info {
+  position: absolute;
+  right: 5%;
+  top: 5%;
+}
