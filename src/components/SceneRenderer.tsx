@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState, Suspense, useCallback, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import StickyNote from "./StickyNote";
 // import ModelRenderer from "./ModelRenderer";
-import { useGLTF } from "@react-three/drei";
-import { XR, createXRStore } from "@react-three/xr";
+import { useGLTF, OrbitControls } from "@react-three/drei";
+import { modelPosition } from "three/tsl";
+// import { XR, createXRStore } from "@react-three/xr";
 
-const store = createXRStore();
+// const store = createXRStore();
 
 const ModelRenderer = React.memo(({ url }: { url: string }) => {
   const { scene } = useGLTF(url);
@@ -88,12 +88,27 @@ const SceneRenderer = React.memo(
       );
     }, [fileData]);
 
+    //load model status mgmt
+    const [modelsLoaded, setModelsLoaded] = useState(false);
+
+    const handleModelsLoaded = useCallback(() => {
+      setModelsLoaded(true);
+    }, []);
+
+    // useEffect(() => {
+    //   if (modelsLoaded) {
+    //     // Any additional actions after model load, if necessary.
+    //   }
+    // }, [modelsLoaded]);
+
     return (
       <>
         {" "}
-        <button onClick={() => store.enterAR()}>Enter AR</button>
+        {/* <button onClick={() => store.enterVR()}>Enter AR</button> */}
+        {/* {!modelsLoaded && <div className="loading-overlay">加载中...</div>} */}
         <Canvas style={{ width: "90vw", height: "80vh" }}>
-          <XR store={store}>
+          <Suspense fallback={null}>
+            {/* <XR store={store}> */}
             <ambientLight intensity={0.5} />
             <OrbitControls maxDistance={6} minDistance={0.1} />
             {modelUrl && <ModelRenderer url={modelUrl} />}
@@ -103,7 +118,8 @@ const SceneRenderer = React.memo(
               onSelectNote={onSelectNote}
               onMoveNote={onMoveNote}
             />
-          </XR>
+            {/* </XR> */}
+          </Suspense>
         </Canvas>
       </>
     );

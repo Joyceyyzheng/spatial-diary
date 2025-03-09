@@ -9,5 +9,8 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // This makes it accessible to all devices on your network
     port: 5173,       // Default port, or you can change this
+    hmr: {
+      host: '9878-216-165-95-144.ngrok-free.app'
+    }
   }
 })

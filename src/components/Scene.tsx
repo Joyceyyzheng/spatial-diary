@@ -16,6 +16,7 @@ import StickyNoteControls from "../components/StickyNoteControl";
 import NoteContent from "../components/NoteContent";
 import { StickyNoteData, NoteEntry } from "../types";
 import SceneInfo from "./SceneInfo";
+import useStore from "../store";
 
 const ScenePage: React.FC = () => {
   const { sceneId } = useParams<{ sceneId: string }>(); // Use specific type for useParams
@@ -72,6 +73,7 @@ const ScenePage: React.FC = () => {
   const [stickyNotes, setStickyNotes] = useState<StickyNoteData[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [showNoteContent, setShowNoteContent] = useState<boolean>(false);
+  const { setNoteContentOpened, noteContentOpened } = useStore();
 
   // Load sticky notes from the DB
   useEffect(() => {
@@ -233,6 +235,14 @@ const ScenePage: React.FC = () => {
             {stickyNotes.map((note, index) => (
               <li key={note.id}>
                 <span>Note {index + 1}</span>
+                <button
+                  onClick={() => {
+                    setSelectedNoteId(note.id);
+                    setNoteContentOpened(true);
+                  }}
+                >
+                  Open
+                </button>
                 <button onClick={() => deleteNote(note.id)}>Delete</button>
               </li>
             ))}
@@ -250,14 +260,14 @@ const ScenePage: React.FC = () => {
           <StickyNoteControls
             selectedNoteId={selectedNoteId}
             onMoveNote={moveStickyNote}
-            onRotateNote={rotateStickyNote}
+            //onRotateNote={rotateStickyNote}
           />
         )}
 
-        {selectedNoteId && showNoteContent && (
+        {selectedNoteId && noteContentOpened && (
           <NoteContent
             noteId={selectedNoteId}
-            onClose={() => setShowNoteContent(false)}
+            onClose={() => setNoteContentOpened(false)}
             onSave={handleNoteContentSave}
             initialEntries={
               stickyNotes.find((note) => note.id === selectedNoteId)?.entries ||
@@ -273,10 +283,10 @@ const ScenePage: React.FC = () => {
           onSelectNote={(noteId) => {
             if (noteId === selectedNoteId) {
               // setSelectedNoteId(null);
-              setShowNoteContent(true);
+              setNoteContentOpened(true);
             } else {
               setSelectedNoteId(noteId);
-              setShowNoteContent(false);
+              setNoteContentOpened(false);
             }
           }}
           onMoveNote={moveStickyNote}

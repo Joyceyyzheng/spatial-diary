@@ -1,6 +1,6 @@
 import { useRef, useMemo } from "react";
 import { Group } from "three";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, Billboard, useTexture } from "@react-three/drei";
 
 interface StickyNoteProps {
   id: string;
@@ -24,22 +24,24 @@ export default function StickyNote({
   const gltf = useGLTF(url);
   const clonedScene = useMemo(() => gltf.scene.clone(), [gltf.scene]);
   const groupRef = useRef<Group>(null);
+  const texture = useTexture(url);
 
   return (
     <>
-      <group
-        ref={groupRef}
-        position={position}
-        onClick={onSelect}
-        rotation={[1.5, 0, 0]}
-      >
-        <primitive
-          object={clonedScene}
-          scale={[0.06, 0.06, 0.06]}
-          receiveShadow
-          castShadow
-        />
-        {/* {content && (
+      <Billboard position={position} onClick={onSelect}>
+        <group
+          ref={groupRef}
+          position={position}
+          onClick={onSelect}
+          rotation={[1.5, 0, 0]}
+        >
+          <primitive
+            object={clonedScene}
+            scale={[0.06, 0.06, 0.06]}
+            receiveShadow
+            castShadow
+          />
+          {/* {content && (
           <Text
             position={[0, 0.5, 0]}
             fontSize={0.2}
@@ -50,15 +52,16 @@ export default function StickyNote({
             {content}
           </Text>
         )} */}
-        {/* {imageUrl && (
+          {/* {imageUrl && (
           <mesh position={[0, 0, 0.1]}>
             <planeGeometry args={[1, 1]} />
             <meshBasicMaterial map={new TextureLoader().load(imageUrl)} />
           </mesh>
         )} */}
-        <pointLight position={[0, 0, 0.5]} intensity={15.0} color="yellow" />
-        {isSelected && <meshStandardMaterial color="blue" />}
-      </group>
+          <pointLight position={[0, 0, 0.5]} intensity={3.0} color="yellow" />
+          {isSelected && <meshStandardMaterial color="blue" />}
+        </group>
+      </Billboard>
     </>
   );
 }
