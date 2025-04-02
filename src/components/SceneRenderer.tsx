@@ -35,7 +35,7 @@ const StickyNotesContainer = React.memo(
   }) => {
     return (
       <>
-        {notes.map((note) => (
+        {notes.map((note, index) => (
           <group
             key={note.id}
             position={note.position}
@@ -51,6 +51,9 @@ const StickyNotesContainer = React.memo(
               onSelect={() => onSelectNote(note.id)}
               onMove={onMoveNote}
               // entries={note.entries}
+              nextNotePosition={
+                index < notes.length - 1 ? notes[index + 1].position : undefined
+              }
             />
             {/* <axesHelper args={[1]} /> */}
           </group>

@@ -93,11 +93,7 @@ const ScenePage: React.FC = () => {
     const newNote: StickyNoteData = {
       id: uuidv4(),
       sceneId,
-      position: [
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1,
-      ] as [number, number, number],
+      position: [0, 0, 0] as [number, number, number],
       rotation: [0, 0, 0] as [number, number, number],
       entries: [],
     };
@@ -207,7 +203,7 @@ const ScenePage: React.FC = () => {
         <div className="file-upload-container">
           <input
             type="file"
-            accept=".glb,.gltf"
+            accept=".glb,.gltf,.ply"
             onChange={handleFileUpload}
             id="model-upload"
             className="hidden-file-input"
