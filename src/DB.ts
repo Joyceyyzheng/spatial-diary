@@ -107,6 +107,23 @@ export interface StickyNoteData {
   audioName?: string;
 }
 
+
+export interface SceneData {
+  id: string;
+  name: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+
+
+export async function updateScene(scene: SceneData) {
+  const db = await initDB();
+  await db.put(SCENES_STORE, scene);
+}
+
+
+
 export async function saveStickyNote(note: StickyNoteData) {
     const db = await initDB();
     await db.put(STICKY_NOTES_STORE, note);

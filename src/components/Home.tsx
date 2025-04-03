@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import { getScenes, deleteScene } from "../DB";
 import { useNavigate } from "react-router-dom";
-import EarthView from "./EarthView";
-import "./EarthView.css";
+// import EarthView from "./EarthView";
+// import "./EarthView.css";
+// import MapView from "./MapView";
+// import "./MapView.css";
+import LeafletMapView from "./LeafletMapView";
+import "./LeafletMapView.css";
 
 interface Scene {
   id: string;
@@ -69,7 +73,7 @@ function Home() {
         </button>
       </div>
 
-      {/* <ul className="text-left w-full list-none">
+      <ul className="text-left w-full list-none">
         {scenes.map((scene) => (
           <li key={scene.id} className="my-2 flex justify-between items-center">
             <div className="mx-2">
@@ -92,7 +96,26 @@ function Home() {
             </div>
           </li>
         ))}
-      </ul> */}
+      </ul>
+      {/* <div className="earth-container">
+        <EarthView
+          scenes={scenes}
+          onSceneSelect={handleSceneSelect}
+          onSceneDelete={handleDeleteScene}
+        />
+      </div> */}
+      <LeafletMapView
+        scenes={scenes}
+        onSceneSelect={handleSceneSelect}
+        onSceneDelete={handleDeleteScene}
+      />
+      <div className="map-container">
+        {/* <MapView
+          scenes={scenes}
+          onSceneSelect={handleSceneSelect}
+          onSceneDelete={handleDeleteScene}
+        /> */}
+      </div>
       <div className="home-container">
         {/* <div className="header">
           <h1 className="title">空间日记</h1>
@@ -100,14 +123,6 @@ function Home() {
             创建新场景
           </button>
         </div> */}
-
-        <div className="earth-container">
-          <EarthView
-            scenes={scenes}
-            onSceneSelect={handleSceneSelect}
-            onSceneDelete={handleDeleteScene}
-          />
-        </div>
       </div>
     </div>
   );
