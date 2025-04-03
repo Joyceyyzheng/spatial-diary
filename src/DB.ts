@@ -103,6 +103,8 @@ export interface StickyNoteData {
   id: string;
   content: string;
   position: [number, number, number];
+  audioUrl?: string; // 添加音频URL
+  audioName?: string;
 }
 
 export async function saveStickyNote(note: StickyNoteData) {

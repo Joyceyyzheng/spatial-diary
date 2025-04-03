@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { getScenes, deleteScene } from "../DB";
 import { useNavigate } from "react-router-dom";
+import EarthView from "./EarthView";
+import "./EarthView.css";
+
+interface Scene {
+  id: string;
+  name: string;
+  latitude?: number;
+  longitude?: number;
+  createdAt: number;
+}
 
 function Home() {
   const [scenes, setScenes] = useState<{ id: string; name: string }[]>([]);
@@ -9,7 +19,14 @@ function Home() {
   useEffect(() => {
     async function loadScenes() {
       const storedScenes = await getScenes();
-      setScenes(storedScenes);
+      const processedScenes = storedScenes.map((scene) => ({
+        ...scene,
+        latitude: scene.latitude ?? Math.random() * 180 - 90,
+        longitude: scene.longitude ?? Math.random() * 360 - 180,
+        createdAt: parseInt(scene.id),
+      }));
+
+      setScenes(processedScenes);
     }
     loadScenes();
   }, []);
@@ -19,6 +36,27 @@ function Home() {
     setScenes((prevScenes) =>
       prevScenes.filter((scene) => scene.id !== sceneId)
     );
+  };
+
+  const handleCreateScene = () => {
+    // 创建新场景时随机生成经纬度
+    const latitude = Math.random() * 180 - 90;
+    const longitude = Math.random() * 360 - 180;
+    const newSceneId = Date.now().toString();
+
+    // 保存新场景（需要更新DB.ts以支持经纬度）
+    updateScene({
+      id: newSceneId,
+      name: "新场景",
+      latitude,
+      longitude,
+    });
+
+    navigate(`/scene/${newSceneId}`);
+  };
+
+  const handleSceneSelect = (sceneId: string) => {
+    navigate(`/scene/${sceneId}`);
   };
 
   return (
@@ -31,7 +69,7 @@ function Home() {
         </button>
       </div>
 
-      <ul className="text-left w-full list-none">
+      {/* <ul className="text-left w-full list-none">
         {scenes.map((scene) => (
           <li key={scene.id} className="my-2 flex justify-between items-center">
             <div className="mx-2">
@@ -54,7 +92,23 @@ function Home() {
             </div>
           </li>
         ))}
-      </ul>
+      </ul> */}
+      <div className="home-container">
+        {/* <div className="header">
+          <h1 className="title">空间日记</h1>
+          <button className="create-button" onClick={handleCreateScene}>
+            创建新场景
+          </button>
+        </div> */}
+
+        <div className="earth-container">
+          <EarthView
+            scenes={scenes}
+            onSceneSelect={handleSceneSelect}
+            onSceneDelete={handleDeleteScene}
+          />
+        </div>
+      </div>
     </div>
   );
 }
