@@ -2,6 +2,7 @@ import { useRef, useMemo } from "react";
 import { Group } from "three";
 import { useGLTF, Billboard, useTexture } from "@react-three/drei";
 import * as THREE from "three";
+import useStore from "../store";
 
 interface StickyNoteProps {
   id: string;
@@ -25,9 +26,31 @@ export default function StickyNote({
   nextNotePosition,
 }: StickyNoteProps) {
   const gltf = useGLTF(url);
-  const clonedScene = useMemo(() => gltf.scene.clone(), [gltf.scene]);
+  const selectedNoteId = useStore((state) => state.selectedNoteId);
+
+  const clonedScene = useMemo(() => {
+    const scene = gltf.scene.clone();
+
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        // 克隆原始材质
+        const originalMaterial = child.material.clone();
+
+        // 只修改发光相关的属性
+        originalMaterial.emissive = new THREE.Color(0xffff00);
+        originalMaterial.emissiveIntensity = selectedNoteId === id ? 1 : 0;
+        originalMaterial.needsUpdate = true;
+
+        child.material = originalMaterial;
+      }
+    });
+
+    return scene;
+  }, [gltf.scene, selectedNoteId, id]);
   const groupRef = useRef<Group>(null);
   const texture = useTexture(url);
+
+  const setSelectedNoteId = useStore((state) => state.setSelectedNoteId);
 
   //calc the connecting dots for shining line
   const linePoints = useMemo(() => {
@@ -52,13 +75,19 @@ export default function StickyNote({
     return [start, midPoint, end];
   }, [nextNotePosition, groupRef.current?.position]);
 
+  // 在点击笔记时
+  const handleClick = () => {
+    setSelectedNoteId(id); // id 是笔记的唯一标识符
+    console.log("set selected note id", id);
+  };
+
   return (
     <>
-      <Billboard position={position} onClick={onSelect}>
+      <Billboard position={position} onClick={handleClick}>
         <group
           ref={groupRef}
           position={position}
-          onClick={onSelect}
+          onClick={handleClick}
           rotation={[1.5, 0, 0]}
         >
           <primitive
@@ -84,49 +113,18 @@ export default function StickyNote({
             <meshBasicMaterial map={new TextureLoader().load(imageUrl)} />
           </mesh>
         )} */}
-          <pointLight position={[0, 0, 0.5]} intensity={3.0} color="yellow" />
-          {isSelected && <meshStandardMaterial color="blue" />}
-
+          {/* {isSelected && (
+            <pointLight
+              position={[0, 0, 0]}
+              intensity={1.0}
+              color="yellow"
+              distance={2}
+            />
+          )} */}
+          {/* <pointLight position={[0, 0, 0.5]} intensity={3.0} color="yellow" /> */}
           {/* 添加连接线 */}
-          {linePoints && (
-            <group>
-              {/* 发光线 */}
-              <mesh>
-                <tubeGeometry
-                  args={[
-                    new THREE.CatmullRomCurve3(linePoints),
-                    20, // 分段数
-                    0.02, // 管道半径
-                    8, // 管道截面分段数
-                    false, // 是否闭合
-                  ]}
-                />
-                <meshStandardMaterial
-                  color="#4fc3f7"
-                  emissive="#4fc3f7"
-                  emissiveIntensity={2}
-                  toneMapped={false}
-                />
-              </mesh>
-              {/* 外部发光效果 */}
-              <mesh>
-                <tubeGeometry
-                  args={[
-                    new THREE.CatmullRomCurve3(linePoints),
-                    20,
-                    0.04, // 稍大的半径形成外发光
-                    8,
-                    false,
-                  ]}
-                />
-                <meshBasicMaterial
-                  color="#4fc3f7"
-                  transparent={true}
-                  opacity={0.3}
-                />
-              </mesh>
-            </group>
-          )}
+          {/* */}
+
           {/*---*/}
         </group>
       </Billboard>
