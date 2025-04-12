@@ -1,4 +1,5 @@
 import { openDB } from "idb";
+import { StickyNoteData, NoteEntry } from "./types";
 
 const DB_NAME = "3DScenesDB";
 const SCENES_STORE = "scenes";
@@ -87,42 +88,6 @@ export async function saveModel(sceneId: string, file: File) {
 //     const sceneData = await db.get("scenes", sceneId);
 //     return sceneData?.stickyNotes || [];
 //   }
-
-
-
-export interface StickyNoteData {
-  id: string;
-  sceneId: string; 
-  position: [number, number, number]; 
-  content?: string; 
-  imageUrl?: string;
-  entries?: NoteEntry[];
-}
-
-  export interface NoteEntry {
-  id: string;
-  content: string;
-  position: [number, number, number];
-  audioUrl?: string; // 添加音频URL
-  audioName?: string;
-}
-
-
-export interface SceneData {
-  id: string;
-  name: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-
-
-export async function updateScene(scene: SceneData) {
-  const db = await initDB();
-  await db.put(SCENES_STORE, scene);
-}
-
-
 
 export async function saveStickyNote(note: StickyNoteData) {
     const db = await initDB();

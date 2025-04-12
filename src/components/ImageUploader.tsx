@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ImageUploader.css";
+import Upload from "../assets/note-entry-upload.svg";
 
 interface ImageUploaderProps {
   onImageReady: (imageUrl: string) => void;
@@ -15,20 +16,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [image, setImage] = useState<string | null>(existingImage);
   const [previewUrl, setPreviewUrl] = useState<string | null>(existingImage);
 
-  // 当外部图片变化时更新内部状态
   useEffect(() => {
     setImage(existingImage);
     setPreviewUrl(existingImage);
   }, [existingImage]);
 
-  // 当内部图片状态变化时通知父组件
   useEffect(() => {
     if (image) {
       onImageReady(image);
     }
   }, [image, onImageReady]);
 
-  // 处理图片文件上传
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -42,7 +40,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     }
   };
 
-  // 清除图片
   const clearImage = () => {
     setImage(null);
     setPreviewUrl(null);
@@ -53,14 +50,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     <div className="image-uploader">
       <div className="upload-section">
         <label htmlFor="image-upload" className="upload-label">
-          上传图片
+          <img src={Upload} alt="upload" /> Upload Files (image/audio)
         </label>
         <input
           id="image-upload"
           type="file"
-          accept="image/*"
+          accept="image/*,audio/*"
           onChange={handleImageUpload}
-          className="file-input"
+          className="file-input hidden "
           disabled={disabled}
         />
       </div>
@@ -69,15 +66,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         <div className="image-preview">
           <img
             src={previewUrl}
-            alt="预览图片"
+            alt="preview"
             className="preview-image"
             onError={(e) => {
-              console.error("图片加载失败");
+              console.error("fail to load the image");
               (e.target as HTMLImageElement).style.display = "none";
             }}
           />
           <button onClick={clearImage} className="clear-image-button">
-            删除图片
+            Delete
           </button>
         </div>
       )}

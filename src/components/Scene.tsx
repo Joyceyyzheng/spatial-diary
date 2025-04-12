@@ -17,7 +17,12 @@ import NoteContent from "../components/NoteContent";
 import { StickyNoteData, NoteEntry } from "../types";
 import SceneInfo from "./SceneInfo";
 import useStore from "../store";
-import HomeIcon from "../assets/delete-gray.svg";
+import HomeIcon from "../assets/home-icon.svg";
+import SaveIcon from "../assets/scene-save.svg";
+import AddIcon from "../assets/stickynote-add.svg";
+import ViewIcon from "../assets/stickynote-view.svg";
+import UploadIcon from "../assets/upload-icon.svg";
+//index.css is the css file
 
 interface NoteContentProps {
   noteId: string;
@@ -26,6 +31,7 @@ interface NoteContentProps {
   initialEntries?: NoteEntry[];
   allNotes: StickyNoteData[];
   onNavigate: (noteId: string) => void;
+  onDelete: (noteId: string) => void;
 }
 
 const ScenePage: React.FC = () => {
@@ -179,10 +185,13 @@ const ScenePage: React.FC = () => {
 
   // delete sticky note
   const deleteNote = async (noteId: string) => {
-    await deleteStickyNote(noteId);
-    const updated = stickyNotes.filter((note) => note.id !== noteId);
-    setStickyNotes(updated);
-    if (selectedNoteId === noteId) {
+    if (
+      selectedNoteId === noteId &&
+      window.confirm("Are you sure you want to delete it？")
+    ) {
+      await deleteStickyNote(noteId);
+      const updated = stickyNotes.filter((note) => note.id !== noteId);
+      setStickyNotes(updated);
       setSelectedNoteId(null);
     }
   };
@@ -218,7 +227,15 @@ const ScenePage: React.FC = () => {
 
   return (
     <div>
+      {/* <div className="flex flex-row items-center min-h-20"> */}
       <div className="scene-header">
+        <button
+          className="scene-button home-button"
+          onClick={() => navigate("/")}
+        >
+          <img src={HomeIcon} alt="home icon" />
+          <span>Home</span>
+        </button>
         <div className="file-upload-container">
           <input
             type="file"
@@ -227,8 +244,12 @@ const ScenePage: React.FC = () => {
             id="model-upload"
             className="hidden-file-input"
           />
-          <label htmlFor="model-upload" className="custom-file-upload button">
-            {fileData ? "Replace 3D Model" : "Upload 3D Model"}
+          <label
+            htmlFor="model-upload"
+            className="custom-file-upload scene-button"
+          >
+            <img src={UploadIcon} alt="upload icon" />
+            <span>{fileData ? "Replace 3D Model" : "Upload 3D Model"}</span>
           </label>
           {fileName && <span className="file-name">{fileName}</span>}
         </div>
@@ -237,18 +258,37 @@ const ScenePage: React.FC = () => {
           placeholder="Enter scene name"
           value={sceneName}
           onChange={(e) => setSceneName(e.target.value)}
+          className={`scene-name-input ${sceneName ? "filled" : ""}`}
         />
-        <button onClick={handleSaveScene}>Save Scene</button>
-        <button
-          className="scene-button home-button"
-          onClick={() => navigate("/")}
-        >
-          Home
+        <button onClick={handleSaveScene} className="scene-button">
+          <img src={SaveIcon} alt="save icon" />
+          <span>Save Scene</span>
         </button>
       </div>
+      <div className="sticky-note-buttons flex flex-row gap-4">
+        <button
+          className="sticky-note-add scene-button"
+          onClick={addStickyNote}
+        >
+          {" "}
+          <img src={AddIcon} alt="add icon" />
+        </button>
+        <button
+          className="sticky-note-view scene-button"
+          onClick={() => {
+            if (stickyNotes.length > 0) {
+              setSelectedNoteId(stickyNotes[0].id);
+              setNoteContentOpened(true);
+            }
+          }}
+        >
+          {" "}
+          <img src={ViewIcon} alt="view icon" />
+        </button>
+      </div>
+      {/* </div> */}
       <div>
-        <div className="sticky-notes-section">
-          <button onClick={addStickyNote}>Add Sticky Note</button>
+        {/* <div className="sticky-notes-section">
           <ul className="sticky-notes-list">
             {stickyNotes.map((note, index) => (
               <li key={note.id}>
@@ -265,7 +305,7 @@ const ScenePage: React.FC = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
         {/* <button className="scene-info" onClick={() => setShowInfo(true)}>
           Info
         </button> */}
@@ -293,6 +333,7 @@ const ScenePage: React.FC = () => {
             }
             allNotes={stickyNotes}
             onNavigate={handleNoteNavigation}
+            onDelete={deleteNote}
           />
         )}
 

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import Record from "../assets/note-entry-record.svg";
+import Recording from "../assets/note-entry-recording.svg";
 
 interface AudioRecorderProps {
   onAudioReady: (audioUrl: string, audioName: string) => void;
@@ -162,7 +164,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
   return (
     <div className="audio-recorder">
-      <div className="upload-controls">
+      {/* <div className="upload-controls">
         <div className="upload-section">
           <label htmlFor="audio-upload" className="upload-label">
             Upload Audio File
@@ -176,19 +178,21 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
             disabled={isRecording || disabled}
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="recording-section">
         {!isRecording ? (
           <button
             onClick={startRecording}
-            className="record-button"
+            className="record-button flex flex-row gap-2 items-center"
             disabled={!!audio || disabled}
           >
+            <img src={Record} alt="record" />
             Start Recording
           </button>
         ) : (
           <div className="recording-controls">
+            <img src={Recording} alt="recording" />
             <span className="recording-indicator">
               Recording {formatRecordingTime(recordingTime)}
             </span>
@@ -200,14 +204,15 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
       </div>
 
       {audio && (
-        <div className="audio-preview">
-          <p>File Chosen: {audioName}</p>
-          <div className="audio-controls">
+        <div className="audio-preview flex flex-row gap-2 items-center">
+          <p>{audioName}</p>
+          <button onClick={clearAudio} className="clear-audio-button">
+            Delete
+          </button>
+          {/* <div className="audio-controls">
             <audio controls src={audio} />
-            <button onClick={clearAudio} className="clear-audio-button">
-              Delete the File
-            </button>
-          </div>
+           
+          </div> */}
         </div>
       )}
     </div>

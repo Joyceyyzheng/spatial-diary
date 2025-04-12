@@ -6,6 +6,15 @@ import ImageUploader from "./ImageUploader";
 import "./ImageUploader.css";
 import useStore from "../store";
 import "./NoteContent.css";
+import Close from "../assets/note-content-close.svg";
+import Move from "../assets/note-content-move.svg";
+import Delete from "../assets/note-content-delete.svg";
+import Edit from "../assets/note-content-edit.svg";
+import Save from "../assets/note-content-save.svg";
+import Play from "../assets/note-entry-audio-play.svg";
+import Pause from "../assets/note-entry-audio-pause.svg";
+import Prev from "../assets/note-prev.svg";
+import Next from "../assets/note-next.svg";
 
 interface NoteContentProps {
   noteId: string;
@@ -14,6 +23,7 @@ interface NoteContentProps {
   initialEntries?: NoteEntry[];
   allNotes: StickyNoteData[];
   onNavigate: (noteId: string) => void;
+  onDelete: (noteId: string) => void;
 }
 interface NoteEntry {
   id: string;
@@ -30,6 +40,7 @@ const NoteContent: React.FC<NoteContentProps> = ({
   initialEntries = [],
   allNotes,
   onNavigate,
+  onDelete,
 }) => {
   const [content, setContent] = useState<string>("");
   const [image, setImage] = useState<string | null>(null);
@@ -48,6 +59,18 @@ const NoteContent: React.FC<NoteContentProps> = ({
   const totalNotes = useStore((state) => state.totalNotes);
   const setSelectedNoteId = useStore((state) => state.setSelectedNoteId);
   const setCurrentNoteIndex = useStore((state) => state.setCurrentNoteIndex);
+  const setNoteContentOpened = useStore((state) => state.setNoteContentOpened);
+  const [editSection, setEditSection] = useState(false);
+
+  const handleMoveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedNoteId(null);
+    setTimeout(() => {
+      setSelectedNoteId(noteId);
+    }, 0);
+    setNoteContentOpened(false);
+    onClose();
+  };
 
   useEffect(() => {
     if (JSON.stringify(entries) !== JSON.stringify(initialEntries)) {
@@ -69,40 +92,9 @@ const NoteContent: React.FC<NoteContentProps> = ({
     setAudioName("");
   }, [noteId, initialEntries]);
 
-  // const handleImageChange = (imageUrl: string) => {
-  //   setImage(imageUrl);
-  // };
-
-  // const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = (e) => {
-  //       const imageUrl = e.target?.result as string;
-  //       setImage(imageUrl);
-  //       // handleImageChange(imageUrl);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
-
   const handleImageReady = (imageUrl: string) => {
     setImage(imageUrl || null);
   };
-
-  //audio handle
-  // const handleAudioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = (e) => {
-  //       const audioUrl = e.target?.result as string;
-  //       setAudio(audioUrl);
-  //       setAudioName(file.name);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
 
   // 处理音频就绪（从AudioRecorder组件）
   const handleAudioReady = (audioUrl: string, name: string) => {
@@ -149,7 +141,6 @@ const NoteContent: React.FC<NoteContentProps> = ({
     setAudioName("");
   };
 
-  // 修改导航处理函数
   const handlePrevNote = () => {
     const currentIndex = allNotes.findIndex((note) => note.id === noteId);
     if (currentIndex > -1) {
@@ -169,117 +160,153 @@ const NoteContent: React.FC<NoteContentProps> = ({
   };
 
   return (
-    <div className="note-content-popup">
-      <div className="note-content-header">
-        {/* <h3>Edit Note {noteId}</h3> */}
-        <h3>Edit Note </h3>
-        <button onClick={onClose}>Close</button>
-      </div>
-
-      <div className="note-content-body">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Enter your note content..."
-        />
-        {/* <input type="file" accept="image/*" onChange={handleImageUpload} /> */}
-        <div className="upload-controls">
-          <div className="media-upload-section">
-            {/* 使用新的ImageUploader组件 */}
-            <ImageUploader
-              onImageReady={handleImageReady}
-              existingImage={image}
-            />
-
-            {/* 使用AudioRecorder组件 */}
-            <AudioRecorder
-              onAudioReady={handleAudioReady}
-              existingAudio={audio ? { url: audio, name: audioName } : null}
-            />
+    <div className="note-content-modal">
+      <div className="note-content-popup">
+        <div className="note-content-header">
+          {/* <h3>Edit Note {noteId}</h3> */}
+          <button className="note-content-close" onClick={onClose}>
+            <img src={Close} alt="close icon" />
+          </button>
+          {/* <h3>Edit Note </h3> */}
+          <div className="note-content-buttons">
+            <button className="note-content-move" onClick={handleMoveClick}>
+              <img src={Move} alt="move icon" />
+            </button>
+            <button
+              className="note-content-delete"
+              onClick={() => {
+                onDelete(noteId);
+                onClose();
+              }}
+            >
+              <img src={Delete} alt="delete icon" />
+            </button>
+            <button
+              className="note-content-edit"
+              onClick={() => {
+                if (editSection) {
+                  handleSave();
+                  setEditSection(false);
+                } else {
+                  setEditSection(true);
+                }
+              }}
+            >
+              {!editSection ? (
+                <img src={Edit} alt="edit icon" />
+              ) : (
+                <img src={Save} alt="save icon" />
+              )}
+              {/* <img src={Edit} alt="edit icon" /> */}
+            </button>
           </div>
-          {/* <div className="upload-section">
-            <label htmlFor="audio-upload" className="upload-label">
-              上传音频
-            </label>
-            <input
-              id="audio-upload"
-              type="file"
-              accept="audio/*"
-              onChange={handleAudioUpload}
-              className="file-input"
-            />
-          </div> */}
         </div>
+        {editSection && (
+          <>
+            {" "}
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="I remember at here that..."
+              className="note-content-input"
+            />
+            {/* <input type="file" accept="image/*" onChange={handleImageUpload} /> */}
+            <div className="upload-controls">
+              <div className="media-upload-section">
+                {/* 使用新的ImageUploader组件 */}
+                <ImageUploader
+                  onImageReady={handleImageReady}
+                  existingImage={image}
+                />
 
-        {/* {audio && (
-          <div className="audio-preview">
-            <p>已选择音频: {audioName}</p>
-            <audio controls src={audio} />
-          </div>
-        )} */}
-
-        <button onClick={handleSave}>Save</button>
-
-        <div className="note-history">
-          {entries && entries.length > 0 ? (
-            entries.map((entry, index) => (
-              <div key={index} className="note-entry">
-                <p>{entry.content || "(No content)"}</p>
-
-                {entry.imageUrl && entry.imageUrl !== "" && (
-                  <img
-                    src={entry.imageUrl}
-                    alt={`Note ${index + 1}`}
-                    style={{ maxWidth: "100%", marginTop: "10px" }}
-                    onError={(e) => (e.currentTarget.style.display = "none")} // 处理无效图片
-                  />
-                )}
-
-                {entry.audioUrl && (
-                  <div className="entry-audio">
-                    <div className="audio-player">
-                      <button
-                        onClick={() => toggleAudio(entry.audioUrl!, entry.id)}
-                        className="audio-toggle-button"
-                      >
-                        {isAudioPlaying[entry.id] ? "暂停" : "播放"}{" "}
-                        {entry.audioName || "音频"}
-                      </button>
-                      <audio
-                        ref={(el) => (audioRefs.current[entry.id] = el)}
-                        src={entry.audioUrl}
-                        onEnded={() =>
-                          setIsAudioPlaying((prev) => ({
-                            ...prev,
-                            [entry.id]: false,
-                          }))
-                        }
-                        style={{ display: "none" }}
-                      />
-                    </div>
-                  </div>
-                )}
+                {/* 使用AudioRecorder组件 */}
+                <AudioRecorder
+                  onAudioReady={handleAudioReady}
+                  existingAudio={audio ? { url: audio, name: audioName } : null}
+                />
               </div>
-            ))
-          ) : (
-            <p>No previous entries.</p>
-          )}
-        </div>
+            </div>
+          </>
+        )}
+        <div className="note-content-body">
+          {/* <button onClick={handleSave}>Save</button> */}
 
-        {/* 修改导航控制部分 */}
-        <div className="note-navigation">
-          <button onClick={handlePrevNote} disabled={allNotes.length <= 1}>
-            上一个
-          </button>
+          <div className="note-history">
+            {entries && entries.length > 0 ? (
+              [...entries].reverse().map((entry, index) => (
+                <div key={entry.id} className="note-entry">
+                  <div className="note-entry-header">
+                    <span className="note-entry-time">
+                      {new Date(entry.timestamp).toLocaleString("zh-CN", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                  <p>{entry.content || ""}</p>
 
-          <span className="note-counter">
-            {allNotes.findIndex((note) => note.id === noteId) + 1} /{" "}
-            {allNotes.length}
-          </span>
+                  {entry.imageUrl && entry.imageUrl !== "" && (
+                    <img
+                      src={entry.imageUrl}
+                      alt={`Note ${index + 1}`}
+                      style={{ maxWidth: "100%", marginTop: "10px" }}
+                      onError={(e) => (e.currentTarget.style.display = "none")} // 处理无效图片
+                    />
+                  )}
 
-          <button onClick={handleNextNote} disabled={allNotes.length <= 1}>
-            下一个
-          </button>
+                  {entry.audioUrl && (
+                    <div className="entry-audio">
+                      <div className="audio-player">
+                        <button
+                          onClick={() => toggleAudio(entry.audioUrl!, entry.id)}
+                          className="audio-toggle-button flex flex-row gap-1"
+                        >
+                          {isAudioPlaying[entry.id] ? (
+                            <img src={Pause} alt="pause icon" />
+                          ) : (
+                            <img src={Play} alt="play icon" />
+                          )}{" "}
+                          {entry.audioName || "Audio"}
+                        </button>
+                        <audio
+                          ref={(el) => (audioRefs.current[entry.id] = el)}
+                          src={entry.audioUrl}
+                          onEnded={() =>
+                            setIsAudioPlaying((prev) => ({
+                              ...prev,
+                              [entry.id]: false,
+                            }))
+                          }
+                          style={{ display: "none" }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No previous entries.</p>
+            )}
+          </div>
+
+          {/* 修改导航控制部分 */}
+          <div className="note-navigation">
+            <button onClick={handlePrevNote} disabled={allNotes.length <= 1}>
+              <img src={Prev} alt="prev" />
+            </button>
+
+            <span className="note-counter">
+              {allNotes.findIndex((note) => note.id === noteId) + 1} /{" "}
+              {allNotes.length}
+            </span>
+
+            <button onClick={handleNextNote} disabled={allNotes.length <= 1}>
+              <img src={Next} alt="next" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

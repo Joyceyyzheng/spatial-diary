@@ -109,7 +109,15 @@ const SceneRenderer = React.memo(
         {" "}
         {/* <button onClick={() => store.enterVR()}>Enter AR</button> */}
         {/* {!modelsLoaded && <div className="loading-overlay">加载中...</div>} */}
-        <Canvas style={{ width: "90vw", height: "80vh", borderRadius: "10px" }}>
+        <Canvas
+          style={{
+            width: "90vw",
+            height: "80vh",
+            borderRadius: "10px",
+            position: "absolute",
+            top: "10%",
+          }}
+        >
           <Suspense fallback={null}>
             {/* <XR store={store}> */}
             <ambientLight intensity={0.1} />

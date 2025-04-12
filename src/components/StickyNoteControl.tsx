@@ -1,10 +1,17 @@
 import React from "react";
 import useStore from "../store";
+import "./StickyNoteControl.css";
+import Up from "../assets/control-up.svg";
+import Down from "../assets/control-down.svg";
+import Left from "../assets/control-left.svg";
+import Right from "../assets/control-right.svg";
+import Zup from "../assets/control-z-up.svg";
+import ZDown from "../assets/control-z-down.svg";
 
 interface StickyNoteControlsProps {
   selectedNoteId: string | null;
   onMoveNote: (
-    id: string,
+    noteId: string,
     axis: "x" | "y" | "z",
     direction: "positive" | "negative"
   ) => void;
@@ -21,6 +28,18 @@ const StickyNoteControls: React.FC<StickyNoteControlsProps> = ({
   // onRotateNote,
 }) => {
   const noteContentOpened = useStore((state) => state.noteContentOpened);
+  const setSelectedNoteId = useStore((state) => state.setSelectedNoteId);
+  const [isVisible, setIsVisible] = React.useState(true);
+  //const isVisible = selectedNoteId !== null;
+  //console.log("selectedNoteId:", selectedNoteId, "isVisible:", isVisible);
+
+  // 当选择新的便签时，显示控制面板
+  React.useEffect(() => {
+    if (selectedNoteId != null && !noteContentOpened) {
+      setIsVisible(true);
+    }
+  }, [selectedNoteId, noteContentOpened]);
+
   //keyboard movement
   React.useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -76,29 +95,59 @@ const StickyNoteControls: React.FC<StickyNoteControlsProps> = ({
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [selectedNoteId, onMoveNote]);
 
-  if (!selectedNoteId) return null;
-
   return (
-    <div className="sticky-note-controls" style={{ marginTop: "10px" }}>
-      <p>Move Selected Note</p>
-      <button onClick={() => onMoveNote(selectedNoteId, "x", "negative")}>
-        Left - A
+    <div className={`sticky-note-controls ${!isVisible ? "hidden" : ""}`}>
+      <button
+        className="close-controls"
+        onClick={(e) => {
+          e.stopPropagation();
+          setSelectedNoteId(null);
+          setIsVisible(false);
+        }}
+      >
+        ×
       </button>
-      <button onClick={() => onMoveNote(selectedNoteId, "x", "positive")}>
-        Right - D
+      {/* <p>Move Selected Note</p> */}
+
+      <button
+        className="move-up control-button"
+        onClick={() => onMoveNote(selectedNoteId!, "y", "positive")}
+      >
+        <img src={Up} alt="up" />
       </button>
-      <button onClick={() => onMoveNote(selectedNoteId, "y", "positive")}>
-        Up - W
+      <button
+        className="move-down control-button"
+        onClick={() => onMoveNote(selectedNoteId!, "y", "negative")}
+      >
+        <img src={Down} alt="down" />
       </button>
-      <button onClick={() => onMoveNote(selectedNoteId, "y", "negative")}>
-        Down - S
+      <button
+        className="move-left control-button"
+        onClick={() => onMoveNote(selectedNoteId!, "x", "negative")}
+      >
+        <img src={Left} alt="left" />
       </button>
-      <button onClick={() => onMoveNote(selectedNoteId, "z", "negative")}>
-        Backward - Q
+      <button
+        className="move-right control-button"
+        onClick={() => onMoveNote(selectedNoteId!, "x", "positive")}
+      >
+        <img src={Right} alt="right" />
       </button>
-      <button onClick={() => onMoveNote(selectedNoteId, "z", "positive")}>
-        Forward - E
+      <button
+        className="move-up-z control-button"
+        onClick={() => onMoveNote(selectedNoteId!, "z", "positive")}
+      >
+        <img src={Zup} alt="z-up" />
       </button>
+      <button
+        className="move-down-z control-button"
+        onClick={() => onMoveNote(selectedNoteId!, "z", "negative")}
+      >
+        <img src={ZDown} alt="z-down" />
+      </button>
+      <span className="control-text">
+        You can also use WASDQE to move the memory!
+      </span>
     </div>
   );
 };
