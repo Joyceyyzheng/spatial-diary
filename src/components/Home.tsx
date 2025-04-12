@@ -7,6 +7,14 @@ import { useNavigate } from "react-router-dom";
 // import "./MapView.css";
 import LeafletMapView from "./LeafletMapView";
 import "./LeafletMapView.css";
+import ListIcon from "../assets/list-view.svg";
+import MapIcon from "../assets/map-view.svg";
+import AddIcon from "../assets/add-button.svg";
+import EnterIcon from "../assets/laptop-enter.svg";
+import InfoIcon from "../assets/info-gray.svg";
+import DeleteIcon from "../assets/delete-gray.svg";
+import SceneInfo from "./SceneInfo";
+import "./Home.css";
 
 interface Scene {
   id: string;
@@ -20,26 +28,37 @@ function Home() {
   const [scenes, setScenes] = useState<{ id: string; name: string }[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function loadScenes() {
-      const storedScenes = await getScenes();
-      const processedScenes = storedScenes.map((scene) => ({
-        ...scene,
-        latitude: scene.latitude ?? Math.random() * 180 - 90,
-        longitude: scene.longitude ?? Math.random() * 360 - 180,
-        createdAt: parseInt(scene.id),
-      }));
+  const [isList, setIsList] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
+  const [infoPosition, setInfoPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
-      setScenes(processedScenes);
-    }
+  const loadScenes = async () => {
+    const storedScenes = await getScenes();
+    const processedScenes = storedScenes.map((scene) => ({
+      ...scene,
+      latitude: scene.latitude ?? Math.random() * 180 - 90,
+      longitude: scene.longitude ?? Math.random() * 360 - 180,
+      createdAt: parseInt(scene.id),
+    }));
+    setScenes(processedScenes);
+  };
+
+  useEffect(() => {
     loadScenes();
   }, []);
 
   const handleDeleteScene = async (sceneId: string) => {
     await deleteScene(sceneId);
-    setScenes((prevScenes) =>
-      prevScenes.filter((scene) => scene.id !== sceneId)
-    );
+
+    if (sceneId && window.confirm("Are you sure you want to delete it？")) {
+      setScenes((prevScenes) =>
+        prevScenes.filter((scene) => scene.id !== sceneId)
+      );
+    }
   };
 
   const handleCreateScene = () => {
@@ -63,40 +82,97 @@ function Home() {
     navigate(`/scene/${sceneId}`);
   };
 
+  const handleView = () => {
+    setIsList(!isList);
+  };
+
+  const handleInfoClick = (e: React.MouseEvent, sceneId: string) => {
+    e.stopPropagation(); // 阻止事件冒泡
+    const rect = e.currentTarget.getBoundingClientRect();
+    setInfoPosition({
+      x: rect.right + 10, // 在按钮右侧显示
+      y: rect.top,
+    });
+    setSelectedSceneId(sceneId);
+    setShowInfo(true);
+  };
+
   return (
     <div>
-      <div style={{}}>
+      <div className="flex flex-row justify-between">
         {" "}
-        <h1 className="my-2">Spatial Diary</h1>
-        <button onClick={() => navigate(`/scene/${Date.now()}`)}>
-          Create New Scene
-        </button>
+        <h1 className="my-2 text-left text-6xl font-bold">Spatial Diary</h1>
+        <div className="my-2 text-left  home-btns">
+          <button
+            className="home-add"
+            onClick={() => navigate(`/scene/${Date.now()}`)}
+          >
+            <img src={AddIcon} alt="view toggle" />
+          </button>
+          <button className="home-map" onClick={handleView}>
+            <img src={isList ? MapIcon : ListIcon} alt="view toggle" />
+          </button>
+        </div>
       </div>
 
-      <ul className="text-left w-full list-none">
-        {scenes.map((scene) => (
-          <li key={scene.id} className="my-2 flex justify-between items-center">
-            <div className="mx-2">
-              {" "}
-              {new Date(parseInt(scene.id)).toLocaleString()} {scene.name}{" "}
-            </div>
-            <div>
-              <button
-                className="mx-0.5"
+      {isList ? (
+        <ul className="text-left w-full list-none list-view">
+          {scenes.map((scene) => (
+            <li
+              key={scene.id}
+              className="scene-entry my-2 flex justify-between items-center cursor-pointer"
+            >
+              <div
+                className="list-info my-2 flex"
                 onClick={() => navigate(`/scene/${scene.id}`)}
               >
-                Open
-              </button>
-              <button
-                className="mx-0.5"
-                onClick={() => handleDeleteScene(scene.id)}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+                {" "}
+                <div className="list-info-name  flex flex-row items-center gap-2">
+                  <img src={EnterIcon} alt="enter icon" />
+                  {scene.name}
+                </div>
+                <div className="list-info-time  flex flex-row items-center ">
+                  {new Date(parseInt(scene.id)).toLocaleDateString()}{" "}
+                </div>
+              </div>
+              <div className="mx-2 flex gap-2">
+                <button
+                  className="home-info mx-0.5"
+                  onClick={(e) => handleInfoClick(e, scene.id)}
+                >
+                  <img src={InfoIcon} alt="info icon" />
+                </button>
+                <button
+                  className="home-delete mx-0.5"
+                  onClick={() => handleDeleteScene(scene.id)}
+                >
+                  <img src={DeleteIcon} alt="delete icon" />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <LeafletMapView
+          scenes={scenes}
+          onSceneSelect={handleSceneSelect}
+          onSceneDelete={handleDeleteScene}
+        />
+      )}
+
+      {showInfo && selectedSceneId && (
+        <SceneInfo
+          sceneId={selectedSceneId}
+          onClose={() => {
+            setShowInfo(false);
+            setSelectedSceneId(null);
+            setInfoPosition(null);
+            loadScenes();
+          }}
+          position={infoPosition || undefined}
+        />
+      )}
+
       {/* <div className="earth-container">
         <EarthView
           scenes={scenes}
@@ -104,11 +180,7 @@ function Home() {
           onSceneDelete={handleDeleteScene}
         />
       </div> */}
-      <LeafletMapView
-        scenes={scenes}
-        onSceneSelect={handleSceneSelect}
-        onSceneDelete={handleDeleteScene}
-      />
+
       <div className="map-container">
         {/* <MapView
           scenes={scenes}

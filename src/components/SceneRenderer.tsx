@@ -44,7 +44,7 @@ const StickyNotesContainer = React.memo(
             {" "}
             <StickyNote
               id={note.id}
-              url="/models/notes.glb"
+              url="/models/envelop1.glb"
               content={note.content}
               imageUrl={note.imageUrl}
               isSelected={selectedNoteId === note.id}
@@ -109,10 +109,10 @@ const SceneRenderer = React.memo(
         {" "}
         {/* <button onClick={() => store.enterVR()}>Enter AR</button> */}
         {/* {!modelsLoaded && <div className="loading-overlay">加载中...</div>} */}
-        <Canvas style={{ width: "90vw", height: "80vh" }}>
+        <Canvas style={{ width: "90vw", height: "80vh", borderRadius: "10px" }}>
           <Suspense fallback={null}>
             {/* <XR store={store}> */}
-            <ambientLight intensity={0.5} />
+            <ambientLight intensity={0.1} />
             <OrbitControls maxDistance={6} minDistance={0.1} />
             {modelUrl && <ModelRenderer url={modelUrl} />}
             <StickyNotesContainer

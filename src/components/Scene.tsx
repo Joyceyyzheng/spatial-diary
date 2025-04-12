@@ -17,6 +17,16 @@ import NoteContent from "../components/NoteContent";
 import { StickyNoteData, NoteEntry } from "../types";
 import SceneInfo from "./SceneInfo";
 import useStore from "../store";
+import HomeIcon from "../assets/delete-gray.svg";
+
+interface NoteContentProps {
+  noteId: string;
+  onClose: () => void;
+  onSave: (entries: NoteEntry[]) => void;
+  initialEntries?: NoteEntry[];
+  allNotes: StickyNoteData[];
+  onNavigate: (noteId: string) => void;
+}
 
 const ScenePage: React.FC = () => {
   const { sceneId } = useParams<{ sceneId: string }>(); // Use specific type for useParams
@@ -197,6 +207,15 @@ const ScenePage: React.FC = () => {
 
   const [showInfo, setShowInfo] = useState(false);
 
+  const handleNoteNavigation = (noteId: string) => {
+    setSelectedNoteId(noteId);
+    // 更新当前笔记的内容
+    const note = stickyNotes.find((note) => note.id === noteId);
+    if (note) {
+      setNoteContentOpened(true);
+    }
+  };
+
   return (
     <div>
       <div className="scene-header">
@@ -220,8 +239,11 @@ const ScenePage: React.FC = () => {
           onChange={(e) => setSceneName(e.target.value)}
         />
         <button onClick={handleSaveScene}>Save Scene</button>
-        <button className="home-button" onClick={() => navigate("/")}>
-          Back to Home
+        <button
+          className="scene-button home-button"
+          onClick={() => navigate("/")}
+        >
+          Home
         </button>
       </div>
       <div>
@@ -244,9 +266,9 @@ const ScenePage: React.FC = () => {
             ))}
           </ul>
         </div>
-        <button className="scene-info" onClick={() => setShowInfo(true)}>
+        {/* <button className="scene-info" onClick={() => setShowInfo(true)}>
           Info
-        </button>
+        </button> */}
 
         {showInfo && sceneId && (
           <SceneInfo sceneId={sceneId} onClose={() => setShowInfo(false)} />
@@ -269,6 +291,8 @@ const ScenePage: React.FC = () => {
               stickyNotes.find((note) => note.id === selectedNoteId)?.entries ||
               []
             }
+            allNotes={stickyNotes}
+            onNavigate={handleNoteNavigation}
           />
         )}
 

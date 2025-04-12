@@ -4,12 +4,16 @@ import AudioRecorder from "./AudioRecorder";
 import "./AudioRecorder.css";
 import ImageUploader from "./ImageUploader";
 import "./ImageUploader.css";
+import useStore from "../store";
+import "./NoteContent.css";
 
 interface NoteContentProps {
   noteId: string;
   onClose: () => void;
   onSave: (entries: NoteEntry[]) => void;
   initialEntries?: NoteEntry[];
+  allNotes: StickyNoteData[];
+  onNavigate: (noteId: string) => void;
 }
 interface NoteEntry {
   id: string;
@@ -24,9 +28,11 @@ const NoteContent: React.FC<NoteContentProps> = ({
   onClose,
   onSave,
   initialEntries = [],
+  allNotes,
+  onNavigate,
 }) => {
   const [content, setContent] = useState<string>("");
-  const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState<string | null>(null);
   const [entries, setEntries] = useState<NoteEntry[]>(initialEntries);
 
   //audio
@@ -36,6 +42,12 @@ const NoteContent: React.FC<NoteContentProps> = ({
     [key: string]: boolean;
   }>({}); // 跟踪音频播放状态
   const audioRefs = useRef<{ [key: string]: HTMLAudioElement | null }>({}); // 引用音频元素
+
+  // 从 store 获取导航相关的状态
+  const currentNoteIndex = useStore((state) => state.currentNoteIndex);
+  const totalNotes = useStore((state) => state.totalNotes);
+  const setSelectedNoteId = useStore((state) => state.setSelectedNoteId);
+  const setCurrentNoteIndex = useStore((state) => state.setCurrentNoteIndex);
 
   useEffect(() => {
     if (JSON.stringify(entries) !== JSON.stringify(initialEntries)) {
@@ -47,6 +59,15 @@ const NoteContent: React.FC<NoteContentProps> = ({
     console.log("Entries updated:", entries);
     console.log("Entries to render:", entries);
   }, [entries]);
+
+  useEffect(() => {
+    // 当 noteId 改变时，重新加载笔记内容
+    setEntries(initialEntries);
+    setContent(""); // 清空编辑框
+    setImage(null);
+    setAudio(null);
+    setAudioName("");
+  }, [noteId, initialEntries]);
 
   // const handleImageChange = (imageUrl: string) => {
   //   setImage(imageUrl);
@@ -126,6 +147,25 @@ const NoteContent: React.FC<NoteContentProps> = ({
     setImage(null);
     setAudio(null);
     setAudioName("");
+  };
+
+  // 修改导航处理函数
+  const handlePrevNote = () => {
+    const currentIndex = allNotes.findIndex((note) => note.id === noteId);
+    if (currentIndex > -1) {
+      const prevIndex = (currentIndex - 1 + allNotes.length) % allNotes.length;
+      const prevNote = allNotes[prevIndex];
+      onNavigate(prevNote.id);
+    }
+  };
+
+  const handleNextNote = () => {
+    const currentIndex = allNotes.findIndex((note) => note.id === noteId);
+    if (currentIndex > -1) {
+      const nextIndex = (currentIndex + 1) % allNotes.length;
+      const nextNote = allNotes[nextIndex];
+      onNavigate(nextNote.id);
+    }
   };
 
   return (
@@ -224,6 +264,22 @@ const NoteContent: React.FC<NoteContentProps> = ({
           ) : (
             <p>No previous entries.</p>
           )}
+        </div>
+
+        {/* 修改导航控制部分 */}
+        <div className="note-navigation">
+          <button onClick={handlePrevNote} disabled={allNotes.length <= 1}>
+            上一个
+          </button>
+
+          <span className="note-counter">
+            {allNotes.findIndex((note) => note.id === noteId) + 1} /{" "}
+            {allNotes.length}
+          </span>
+
+          <button onClick={handleNextNote} disabled={allNotes.length <= 1}>
+            下一个
+          </button>
         </div>
       </div>
     </div>

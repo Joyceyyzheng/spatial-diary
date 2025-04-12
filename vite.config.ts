@@ -5,12 +5,13 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(),],
+  plugins: [react(), tailwindcss()],
   server: {
     host: '0.0.0.0', // This makes it accessible to all devices on your network
     port: 5173,       // Default port, or you can change this
     hmr: {
-      host: '9878-216-165-95-144.ngrok-free.app'
+      overlay: true,  // 显示错误覆盖层
+      clientPort: 5173  // 确保客户端端口与服务器端口一致
     }
   }
 })

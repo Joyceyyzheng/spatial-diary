@@ -3,6 +3,7 @@ import { Group } from "three";
 import { useGLTF, Billboard, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import useStore from "../store";
+import { useSpring, animated } from "@react-spring/three";
 
 interface StickyNoteProps {
   id: string;
@@ -37,8 +38,8 @@ export default function StickyNote({
         const originalMaterial = child.material.clone();
 
         // 只修改发光相关的属性
-        originalMaterial.emissive = new THREE.Color(0xffff00);
-        originalMaterial.emissiveIntensity = selectedNoteId === id ? 1 : 0;
+        originalMaterial.emissive = new THREE.Color(0xff5e00);
+        originalMaterial.emissiveIntensity = selectedNoteId === id ? 3 : 0;
         originalMaterial.needsUpdate = true;
 
         child.material = originalMaterial;
@@ -87,15 +88,18 @@ export default function StickyNote({
         <group
           ref={groupRef}
           position={position}
-          onClick={handleClick}
+          onClick={onSelect}
           rotation={[1.5, 0, 0]}
         >
           <primitive
             object={clonedScene}
-            scale={[0.06, 0.06, 0.06]}
+            scale={selectedNoteId === id ? [0.1, 0.1, 0.1] : [0.06, 0.06, 0.06]}
             receiveShadow
             castShadow
           />
+          <pointLight position={[0, 0, 0.5]} intensity={3.0} color="yellow" />
+          {isSelected && <meshStandardMaterial color="blue" />}
+
           {/* {content && (
           <Text
             position={[0, 0.5, 0]}

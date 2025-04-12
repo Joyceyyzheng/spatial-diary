@@ -3,6 +3,10 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./LeafletMapView.css";
+import EnterIcon from "../assets/laptop-enter.svg";
+import InfoIcon from "../assets/info-gray.svg";
+import DeleteIcon from "../assets/delete-gray.svg";
+import SceneInfo from "./SceneInfo";
 
 // 修改图标路径
 let DefaultIcon = L.icon({
@@ -100,6 +104,11 @@ const LeafletMapView: React.FC<LeafletMapViewProps> = ({
   onSceneDelete,
 }) => {
   const [selectedScene, setSelectedScene] = useState<Scene | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
+  const [infoPosition, setInfoPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   // 处理标记点击
   const handleMarkerClick = (scene: Scene) => {
@@ -115,10 +124,24 @@ const LeafletMapView: React.FC<LeafletMapViewProps> = ({
 
   // 处理场景删除
   const handleSceneDelete = () => {
-    if (selectedScene && window.confirm("确定要删除这个场景吗？")) {
+    if (
+      selectedScene &&
+      window.confirm("Are you sure you want to delete it？")
+    ) {
       onSceneDelete(selectedScene.id);
       setSelectedScene(null);
     }
+  };
+
+  // 处理信息按钮点击
+  const handleInfoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setInfoPosition({
+      x: rect.right + 10,
+      y: rect.top,
+    });
+    setShowInfo(true);
   };
 
   return (
@@ -157,18 +180,44 @@ const LeafletMapView: React.FC<LeafletMapViewProps> = ({
               }}
             >
               <Popup>
-                <div className="scene-popup-content">
-                  <h3>{scene.name || "未命名场景"}</h3>
-                  <p>创建时间: {new Date(scene.createdAt).toLocaleString()}</p>
-                  <div className="popup-buttons">
-                    <button onClick={handleSceneOpen} className="open-button">
-                      打开
+                <div className="scene-popup-content flex flex-col gap-2">
+                  <div className="popup-title">
+                    {scene.name || "Unnamed Scene"}
+                  </div>
+
+                  <div className="popup-buttons flex flex-col gap-2 ">
+                    <button
+                      onClick={handleSceneOpen}
+                      className="popup-button flex flex-row gap-2 items-center text-center"
+                    >
+                      <img
+                        src={EnterIcon}
+                        className="content-icon"
+                        alt="enter icon"
+                      />{" "}
+                      open
+                    </button>
+                    <button
+                      onClick={handleInfoClick}
+                      className="popup-button info-button"
+                    >
+                      <img
+                        src={InfoIcon}
+                        className="content-icon"
+                        alt="info icon"
+                      />
+                      info
                     </button>
                     <button
                       onClick={handleSceneDelete}
-                      className="delete-button"
+                      className="popup-button"
                     >
-                      删除
+                      <img
+                        src={DeleteIcon}
+                        className="content-icon"
+                        alt="delete icon"
+                      />
+                      delete
                     </button>
                   </div>
                 </div>
@@ -177,6 +226,17 @@ const LeafletMapView: React.FC<LeafletMapViewProps> = ({
           );
         })}
       </MapContainer>
+
+      {showInfo && selectedScene && (
+        <SceneInfo
+          sceneId={selectedScene.id}
+          onClose={() => {
+            setShowInfo(false);
+            setInfoPosition(null);
+          }}
+          position={infoPosition || undefined}
+        />
+      )}
     </div>
   );
 };

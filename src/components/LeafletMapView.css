@@ -1,19 +1,14 @@
 .leaflet-map-container {
-  min-width: 50vw;
+  min-width: 70vw;
   height: 60vh;
-  min-height: 500px;
-  border-radius: 8px;
+  min-height: 600px;
+  border-radius: 10px;
   overflow: hidden;
   /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
 }
 
-.leaflet-container {
-  min-width: 50vw;
-  height: 60vh;
-  min-height: 500px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+.leaflet-popup-tip {
+  background-color: var(--beige);
 }
 
 /* 在移动设备上调整地图高度 */
@@ -23,30 +18,36 @@
     min-height: 400px;
     max-height: 600px;
   }
+
+  .popup-title {
+    font-size: var(--phone-body);
+    font-weight: 600;
+    /* text-align: center; */
+  }
 }
 
 /* 弹出窗口样式 */
 .scene-popup-content {
   min-width: 200px;
-  padding: 10px;
-}
-
-.scene-popup-content h3 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.scene-popup-content p {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  color: #666;
+  /* padding: 10px; */
+  background-color: var(--beige);
 }
 
 .popup-buttons {
   display: flex;
   justify-content: space-between;
   gap: 10px;
+}
+
+.popup-button {
+  font-size: var(--laptop-h2);
+  font-weight: 400;
+
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  text-align: center;
 }
 
 .popup-buttons button {
@@ -57,9 +58,21 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s;
+  background-color: none;
+  color: black;
 }
 
-.popup-buttons .open-button {
+.popup-title {
+  font-size: var(--laptop-h2);
+  font-weight: 600;
+  text-align: center;
+}
+.content-icon {
+  width: 25px;
+  height: 25px;
+  opacity: 60%;
+}
+/* .popup-buttons .open-button {
   background-color: #4caf50;
   color: white;
 }
@@ -75,7 +88,7 @@
 
 .popup-buttons .delete-button:hover {
   background-color: #d32f2f;
-}
+} */
 
 /* 修复 Leaflet 弹出窗口样式 */
 .leaflet-popup-content {
@@ -83,7 +96,8 @@
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: 8px;
+  border-radius: var(--border-radius);
+  background-color: var(--beige);
 }
 
 /* 自定义标记样式 */

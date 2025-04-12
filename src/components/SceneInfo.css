@@ -1,0 +1,173 @@
+.scene-info-modal {
+  position: fixed;
+  inset: 0;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  z-index: 500;
+}
+
+.scene-info-content {
+  background-color: var(--beige);
+  padding: 1.5rem;
+  border-style: solid;
+  border-radius: var(--border-radius);
+  border-width: var(--popup-stroke);
+  box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.25);
+  width: 40vw;
+  /* max-width: 30vw; */
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(0, 0);
+}
+
+.scene-info-header {
+  display: flex;
+  /* justify-content: space-between; */
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.scene-info-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #374151;
+}
+
+.scene-info-close {
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.scene-info-close:hover {
+  color: #374151;
+}
+
+.scene-info-section {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.scene-info-label {
+  display: block;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.scene-info-loc {
+  width: 10rem;
+}
+.scene-info-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+
+  font-size: var(--phone-description);
+  background-color: white;
+}
+
+.scene-info-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.scene-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.scene-info-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.scene-info-save {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.scene-info-save-button {
+  border-style: solid;
+  border-width: var(--popup-stroke);
+  border-color: var(--brown);
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--border-radius);
+  color: black;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scene-info-save-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.scene-info-save-button:not(:disabled) {
+  background-color: var(--beige);
+}
+
+.scene-info-save-button:not(:disabled):hover {
+  background-color: var(--beige);
+}
+
+.scene-info-save-success {
+  background-color: #10b981;
+}
+
+.scene-info-save-success:hover {
+  background-color: #059669;
+}
+
+.scene-info-random-button {
+  font-size: 0.875rem;
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.scene-info-random-button:hover {
+  background-color: #2563eb;
+}
+
+/* 移动端样式 */
+@media only screen and (max-width: 600px) {
+  .scene-info-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.25);
+    z-index: 500;
+  }
+
+  .scene-info-content {
+    width: 85vw;
+    position: relative;
+    margin: 0;
+    top: auto;
+    left: auto;
+    transform: none;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .scene-info-section {
+    gap: 1rem;
+  }
+}

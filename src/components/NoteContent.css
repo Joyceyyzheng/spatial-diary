@@ -1,0 +1,53 @@
+.note-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid #eee;
+  margin-top: auto;
+}
+
+.note-counter {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.note-navigation button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #4287f5;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-navigation button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.note-navigation button:hover {
+  background-color: #2b6cd4;
+  transform: translateY(-1px);
+}
+
+.note-navigation button:active {
+  transform: translateY(1px);
+}
+
+.note-content-popup {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.note-content-body {
+  flex: 1;
+  overflow-y: auto;
+  transition: opacity 0.3s ease;
+}
+
+.note-entry {
+  transition: all 0.3s ease;
+}

@@ -1,18 +1,28 @@
 :root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --default-gray: #f9f9f9;
+  --beige: #fffced;
+  --laptop-h1: 25;
+  --laptop-h2: 20;
+  --border-radius: 10px;
+  --popup-stroke: 0.5px;
+  --phone-description: 12px;
+  --brown: #482626;
+  --phone-body: 16;
+
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
   color: rgba(0, 0, 0, 0.87);
-  background-color: #fcf7e9;
+
+  background-color: var(--beige);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  --default-gray: #f9f9f9;
 }
 
 a {
@@ -25,7 +35,7 @@ a:hover {
 }
 
 body {
-  margin: 0;
+  /* margin: 0; */
   display: flex;
   place-items: center;
   /* min-width: 320px; */
@@ -41,18 +51,20 @@ button,
 .button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
   font-size: 0.8em;
   font-weight: 500;
   font-family: inherit;
   color: black;
-  background-color: var(--default-gray);
+  /* background-color: var(--default-gray); */
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover,
 .button:hover {
-  border-color: #646cff;
+  /* border-color: #646cff; */
+  transform: scale(1.05);
 }
 /* button:focus,
 button:focus-visible,
@@ -64,8 +76,8 @@ button:focus-visible,
 
 button:active,
 .button:active {
-  background-color: #646cff;
-  outline: 4px auto -webkit-focus-ring-color;
+  /* background-color: #646cff;
+  outline: 4px auto -webkit-focus-ring-color; */
   transition: background-color 0.2s ease-in-out;
 }
 
@@ -151,6 +163,10 @@ button:active,
 
   width: 50vw;
   height: 80vh;
+
+  overflow: auto;
+  scrollbar-width: 6px;
+  scrollbar-color: #d9d9d9;
 }
 
 .note-content-header {
@@ -186,12 +202,20 @@ textarea {
   border-radius: 4px;
 }
 
-.home-button {
+.scene-button {
+  /*button for all */
+  background-color: var(--beige);
+  border-style: none;
+  font-weight: 500;
+  font-size: var(--laptop-h2);
   z-index: 1000;
+}
+
+.home-button {
   position: absolute;
-  top: 5%;
-  left: 0%;
-  margin-left: 1em;
+  top: 3%;
+  left: 1%;
+  /* margin-left: 1em; */
 }
 
 .scene-info {
@@ -202,7 +226,8 @@ textarea {
 
 .upload-controls {
   display: flex;
-  gap: 10px;
+  /* height: 2rem; */
+  /* gap: 10px; */
   margin: 10px 0;
 }
 
