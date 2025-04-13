@@ -4,14 +4,31 @@ import StickyNote from "./StickyNote";
 // import ModelRenderer from "./ModelRenderer";
 import { useGLTF, OrbitControls } from "@react-three/drei";
 import { modelPosition } from "three/tsl";
-// import { XR, createXRStore } from "@react-three/xr";
+import {
+  XR,
+  createXRStore,
+  noEvents,
+  PointerEvents,
+  IfInSessionMode,
+} from "@react-three/xr";
 
-// const store = createXRStore();
+const store = createXRStore();
 
 const ModelRenderer = React.memo(({ url }: { url: string }) => {
+  console.log("ModelRenderer loading URL:", url);
   const { scene } = useGLTF(url);
+  console.log("Model loaded successfully", scene);
+
   return <primitive object={scene} />;
 });
+
+interface StickyNoteData {
+  id: string;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  content: string;
+  imageUrl?: string;
+}
 
 interface Note extends StickyNoteData {
   url?: string;
@@ -22,16 +39,10 @@ const StickyNotesContainer = React.memo(
     notes,
     selectedNoteId,
     onSelectNote,
-    onMoveNote,
   }: {
     notes: Note[];
     selectedNoteId: string | null;
     onSelectNote: (id: string) => void;
-    onMoveNote: (
-      id: string,
-      axis: "x" | "y" | "z",
-      direction: "positive" | "negative"
-    ) => void;
   }) => {
     return (
       <>
@@ -45,12 +56,11 @@ const StickyNotesContainer = React.memo(
             <StickyNote
               id={note.id}
               url="/models/envelop1.glb"
+              position={note.position}
               content={note.content}
               imageUrl={note.imageUrl}
               isSelected={selectedNoteId === note.id}
               onSelect={() => onSelectNote(note.id)}
-              onMove={onMoveNote}
-              // entries={note.entries}
               nextNotePosition={
                 index < notes.length - 1 ? notes[index + 1].position : undefined
               }
@@ -65,14 +75,9 @@ const StickyNotesContainer = React.memo(
 
 interface SceneRendererProps {
   fileData: ArrayBuffer | null;
-  stickyNotes: { id: string; position: [number, number, number] }[];
+  stickyNotes: Note[];
   selectedNoteId: string | null;
   onSelectNote: (id: string) => void;
-  onMoveNote: (
-    id: string,
-    axis: "x" | "y" | "z",
-    direction: "positive" | "negative"
-  ) => void;
 }
 
 const SceneRenderer = React.memo(
@@ -81,14 +86,18 @@ const SceneRenderer = React.memo(
     stickyNotes,
     selectedNoteId,
     onSelectNote,
-    onMoveNote,
   }: SceneRendererProps) => {
     //convert fileData to url
     const modelUrl = React.useMemo(() => {
-      if (!fileData) return null;
-      return URL.createObjectURL(
-        new Blob([fileData], { type: "model/gltf-binary" })
-      );
+      if (!fileData) {
+        console.log("No fileData available");
+        return null;
+      }
+      console.log("Creating URL from fileData, size:", fileData.byteLength);
+      const blob = new Blob([fileData], { type: "model/gltf-binary" });
+      const url = URL.createObjectURL(blob);
+      console.log("Created model URL:", url);
+      return url;
     }, [fileData]);
 
     //load model status mgmt
@@ -98,16 +107,20 @@ const SceneRenderer = React.memo(
       setModelsLoaded(true);
     }, []);
 
-    // useEffect(() => {
-    //   if (modelsLoaded) {
-    //     // Any additional actions after model load, if necessary.
-    //   }
-    // }, [modelsLoaded]);
+    useEffect(() => {
+      console.log(
+        "SceneRenderer mounted, fileData:",
+        fileData ? "exists" : "null"
+      );
+      console.log("modelUrl:", modelUrl);
+    }, [fileData, modelUrl]);
 
     return (
       <>
         {" "}
-        {/* <button onClick={() => store.enterVR()}>Enter AR</button> */}
+        {/* <div className="xr-buttons">
+          <button onClick={() => store.enterVR()}>Enter VR</button>
+        </div> */}
         {/* {!modelsLoaded && <div className="loading-overlay">加载中...</div>} */}
         <Canvas
           style={{
@@ -117,20 +130,41 @@ const SceneRenderer = React.memo(
             position: "absolute",
             top: "10%",
           }}
+          events={noEvents}
         >
+          {/* <XR store={store}> */}
           <Suspense fallback={null}>
-            {/* <XR store={store}> */}
             <ambientLight intensity={0.1} />
-            <OrbitControls maxDistance={6} minDistance={0.1} />
-            {modelUrl && <ModelRenderer url={modelUrl} />}
+            {/* <IfInSessionMode deny={["immersive-ar", "immersive-vr"]}> */}
+            <OrbitControls
+              maxDistance={6}
+              minDistance={0.1}
+              // target={[0, 0, 0]}
+              // position={[-2, -2, -2]}
+              // enableDamping={true}
+              // dampingFactor={0.05}
+            />
+            {/* </IfInSessionMode> */}
+            <PointerEvents />
+            {modelUrl && (
+              <>
+                <group position={[0, -1, 0]}>
+                  {/* vr test y=1.3 */}
+                  <ModelRenderer url={modelUrl} />
+                </group>
+                {/* <mesh>
+                    <boxGeometry args={[1, 1, 1]} />
+                    <meshBasicMaterial color="red" />
+                  </mesh> */}
+              </>
+            )}
             <StickyNotesContainer
               notes={stickyNotes}
               selectedNoteId={selectedNoteId}
               onSelectNote={onSelectNote}
-              onMoveNote={onMoveNote}
             />
-            {/* </XR> */}
           </Suspense>
+          {/* </XR> */}
         </Canvas>
       </>
     );

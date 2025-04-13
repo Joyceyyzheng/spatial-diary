@@ -15,7 +15,8 @@
   "dependencies": {
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.18.0",
-    "@react-three/xr": "^6.6.6",
+    "@react-three/handle": "^6.6.13",
+    "@react-three/xr": "^6.6.13",
     "@tailwindcss/vite": "^4.0.9",
     "@types/three": "^0.172.0",
     "idb": "^8.0.2",

@@ -9,6 +9,8 @@ import {
   getStickyNotesBySceneId,
   deleteStickyNote,
 } from "../DB";
+import { XR, createXRStore } from "@react-three/xr";
+import { Canvas } from "@react-three/fiber";
 
 import { v4 as uuidv4 } from "uuid";
 import SceneRenderer from "../components/SceneRenderer";
@@ -22,6 +24,7 @@ import SaveIcon from "../assets/scene-save.svg";
 import AddIcon from "../assets/stickynote-add.svg";
 import ViewIcon from "../assets/stickynote-view.svg";
 import UploadIcon from "../assets/upload-icon.svg";
+import "./Scene.css";
 //index.css is the css file
 
 interface NoteContentProps {
@@ -40,15 +43,43 @@ const ScenePage: React.FC = () => {
 
   const [scene, setScene] = useState<{ id: string; name: string } | null>(null);
   const [sceneName, setSceneName] = useState<string>("");
+  const [isXRMode, setIsXRMode] = useState(false);
 
   useEffect(() => {
     async function loadScene() {
       if (sceneId) {
+        console.log("Loading scene:", sceneId);
         const storedScene = await getSceneById(sceneId);
-        if (storedScene) {
-          setScene(storedScene);
-          setSceneName(storedScene.name);
-        }
+        console.log("Stored scene:", storedScene);
+
+        // if (storedScene || sceneId === "predefined") {
+        //   setScene(storedScene ?? { id: "predefined", name: "Example" });
+        //   setSceneName(storedScene?.name ?? "Example");
+
+        //   // 如果是预定义场景，加载预定义模型
+        //   if (sceneId === "predefined") {
+        //     try {
+        //       console.log("Loading predefined model...");
+        //       const response = await fetch("/models/livingroom.glb");
+        //       console.log("Model fetch response:", response.status);
+        //       if (!response.ok)
+        //         throw new Error(`HTTP error! status: ${response.status}`);
+        //       const model = await response.arrayBuffer();
+        //       console.log("Model loaded, size:", model.byteLength);
+        //       setFileData(model);
+        //       setFileName("livingroom.glb");
+        //     } catch (error) {
+        //       console.error("Error loading model:", error);
+        //     }
+        //   } else {
+        //     // 对于其他场景，尝试加载保存的模型
+        //     const model = await getModel(sceneId);
+        //     if (model) {
+        //       setFileData(model.model);
+        //       setFileName(model.fileName);
+        //     }
+        //   }
+        // }
       }
     }
     loadScene();
@@ -264,6 +295,9 @@ const ScenePage: React.FC = () => {
           <img src={SaveIcon} alt="save icon" />
           <span>Save Scene</span>
         </button>
+        {/* <button className="scene-button" onClick={() => setIsXRMode(!isXRMode)}>
+          {isXRMode ? "Exit XR" : "Enter XR"}
+        </button> */}
       </div>
       <div className="sticky-note-buttons flex flex-row gap-4">
         <button
@@ -337,21 +371,40 @@ const ScenePage: React.FC = () => {
           />
         )}
 
-        <SceneRenderer
-          fileData={fileData}
-          stickyNotes={stickyNotes}
-          selectedNoteId={selectedNoteId}
-          onSelectNote={(noteId) => {
-            if (noteId === selectedNoteId) {
-              // setSelectedNoteId(null);
-              setNoteContentOpened(true);
-            } else {
-              setSelectedNoteId(noteId);
-              setNoteContentOpened(false);
-            }
-          }}
-          onMoveNote={moveStickyNote}
-        />
+        {isXRMode ? (
+          <div className="xr-container">
+            {/* <XRButton mode="immersive-vr" /> */}
+            <Canvas>
+              <XR mode="immersive-vr">
+                <ambientLight intensity={0.5} />
+                <pointLight position={[10, 10, 10]} />
+                {fileData && (
+                  <primitive
+                    object={fileData}
+                    position={[0, 0, 0]}
+                    scale={[1, 1, 1]}
+                  />
+                )}
+              </XR>
+            </Canvas>
+          </div>
+        ) : (
+          <SceneRenderer
+            fileData={fileData}
+            stickyNotes={stickyNotes}
+            selectedNoteId={selectedNoteId}
+            onSelectNote={(noteId) => {
+              if (noteId === selectedNoteId) {
+                // setSelectedNoteId(null);
+                setNoteContentOpened(true);
+              } else {
+                setSelectedNoteId(noteId);
+                setNoteContentOpened(false);
+              }
+            }}
+            onMoveNote={moveStickyNote}
+          />
+        )}
       </div>
     </div>
   );

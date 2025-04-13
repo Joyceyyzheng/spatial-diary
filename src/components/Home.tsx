@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getScenes, deleteScene } from "../DB";
+import { getScenes, deleteScene, saveScene } from "../DB";
 import { useNavigate } from "react-router-dom";
 // import EarthView from "./EarthView";
 // import "./EarthView.css";
@@ -22,6 +22,7 @@ interface Scene {
   latitude?: number;
   longitude?: number;
   createdAt: number;
+  modelUrl?: string;
 }
 
 function Home() {
@@ -44,7 +45,31 @@ function Home() {
       longitude: scene.longitude ?? Math.random() * 360 - 180,
       createdAt: parseInt(scene.id),
     }));
-    setScenes(processedScenes);
+
+    // 添加预定义场景
+    const predefinedScene = {
+      id: "predefined",
+      name: "Example",
+      latitude: 40.7128,
+      longitude: -74.006,
+      createdAt: Date.now(),
+      modelUrl: "/models/livingroom.glb",
+    };
+
+    // 检查是否已经存在预定义场景
+    const existingPredefinedScene = processedScenes.find(
+      (scene) => scene.id === "predefined"
+    );
+    if (!existingPredefinedScene) {
+      // 如果不存在，添加到数据库
+      await saveScene(predefinedScene);
+    }
+    const refreshedScenes = await getScenes();
+
+    setScenes([
+      // predefinedScene,
+      ...refreshedScenes.filter((scene) => scene.id !== "predefined"),
+    ]);
   };
 
   useEffect(() => {

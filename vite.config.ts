@@ -10,8 +10,9 @@ export default defineConfig({
     host: '0.0.0.0', // This makes it accessible to all devices on your network
     port: 5173,       // Default port, or you can change this
     hmr: {
-      overlay: true,  // 显示错误覆盖层
-      clientPort: 5173  // 确保客户端端口与服务器端口一致
+      host: '2de2-2600-4041-5991-a600-34eb-3220-37f2-ebf6.ngrok-free.app',
+      overlay: true,  
+      clientPort: 5173  
     }
   }
 })

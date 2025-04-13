@@ -121,7 +121,7 @@ button:active,
   align-items: center;
   width: 75vw;
   gap: 1rem;
-  background-color: var(--beige);
+  /* background-color: var(--beige); */
   border-radius: var(--border-radius);
   margin-bottom: 0.5rem;
 }
@@ -171,7 +171,7 @@ button:active,
 
 .scene-button {
   /*button for all */
-  background-color: var(--beige);
+  /* background-color: var(--beige); */
   border-style: none;
   font-weight: 600;
   font-size: var(--laptop-h2);
