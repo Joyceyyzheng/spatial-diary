@@ -13,8 +13,22 @@ const ModelRenderer = React.memo(({ url }: { url: string }) => {
   return <primitive object={scene} />;
 });
 
-interface Note extends StickyNoteData {
-  url?: string;
+interface StickyNoteProps {
+  id: string;
+  url: string;
+  position: [number, number, number];
+  content?: string;
+  imageUrl?: string;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+interface Note {
+  id: string;
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  content?: string;
+  imageUrl?: string;
 }
 
 const StickyNotesContainer = React.memo(
@@ -41,21 +55,19 @@ const StickyNotesContainer = React.memo(
             position={note.position}
             rotation={note.rotation}
           >
-            {" "}
             <StickyNote
               id={note.id}
               url="/models/envelop1.glb"
+              position={note.position}
               content={note.content}
               imageUrl={note.imageUrl}
               isSelected={selectedNoteId === note.id}
               onSelect={() => onSelectNote(note.id)}
               onMove={onMoveNote}
-              // entries={note.entries}
               nextNotePosition={
                 index < notes.length - 1 ? notes[index + 1].position : undefined
               }
             />
-            {/* <axesHelper args={[1]} /> */}
           </group>
         ))}
       </>
@@ -65,7 +77,7 @@ const StickyNotesContainer = React.memo(
 
 interface SceneRendererProps {
   fileData: ArrayBuffer | null;
-  stickyNotes: { id: string; position: [number, number, number] }[];
+  stickyNotes: Note[];
   selectedNoteId: string | null;
   onSelectNote: (id: string) => void;
   onMoveNote: (
@@ -73,6 +85,7 @@ interface SceneRendererProps {
     axis: "x" | "y" | "z",
     direction: "positive" | "negative"
   ) => void;
+  onAddNote: (note: Note) => void;
 }
 
 const SceneRenderer = React.memo(
@@ -82,6 +95,7 @@ const SceneRenderer = React.memo(
     selectedNoteId,
     onSelectNote,
     onMoveNote,
+    onAddNote,
   }: SceneRendererProps) => {
     //convert fileData to url
     const modelUrl = React.useMemo(() => {

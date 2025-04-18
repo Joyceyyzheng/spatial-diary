@@ -13,6 +13,11 @@ interface StickyNoteProps {
   imageUrl?: string;
   isSelected: boolean;
   onSelect: () => void;
+  onMove?: (
+    id: string,
+    axis: "x" | "y" | "z",
+    direction: "positive" | "negative"
+  ) => void;
   nextNotePosition?: [number, number, number]; //for the shining line
 }
 
