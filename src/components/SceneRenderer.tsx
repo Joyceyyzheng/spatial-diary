@@ -5,7 +5,8 @@ import StickyNote from "./StickyNote";
 import { useGLTF, OrbitControls } from "@react-three/drei";
 import { modelPosition } from "three/tsl";
 // import { XR, createXRStore } from "@react-three/xr";
-
+import GlowingSphere from "./GlowingSphere";
+import { Note } from "../types";
 // const store = createXRStore();
 
 const ModelRenderer = React.memo(({ url }: { url: string }) => {

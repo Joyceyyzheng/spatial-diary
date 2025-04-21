@@ -14,6 +14,7 @@ import EnterIcon from "../assets/laptop-enter.svg";
 import InfoIcon from "../assets/info-gray.svg";
 import DeleteIcon from "../assets/delete-gray.svg";
 import SceneInfo from "./SceneInfo";
+import QuestionIcon from "../assets/question-mark.svg";
 import "./Home.css";
 
 interface Scene {
@@ -35,6 +36,8 @@ function Home() {
     x: number;
     y: number;
   } | null>(null);
+
+  const [showQuestion, setShowQuestion] = useState(false);
 
   const loadScenes = async () => {
     const storedScenes = await getScenes();
@@ -97,6 +100,10 @@ function Home() {
     setShowInfo(true);
   };
 
+  const handleQuestion = () => {
+    setShowQuestion(!showQuestion);
+  };
+
   return (
     <div>
       <div className="flex flex-row justify-between">
@@ -114,6 +121,22 @@ function Home() {
           </button>
         </div>
       </div>
+
+      <button className="home-question" onClick={handleQuestion}>
+        <img src={QuestionIcon} alt="instruction" />
+      </button>
+
+      {showQuestion && (
+        <div className="question-modal">
+          <div className="question-modal-content">
+            <button onClick={handleQuestion} className="close-button">
+              ×
+            </button>
+            <h2>Instruction</h2>
+            <p>Nothing else yet please check the PDF i sent 💖</p>
+          </div>
+        </div>
+      )}
 
       {isList ? (
         <ul className="text-left w-full list-none list-view">

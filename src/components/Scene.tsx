@@ -280,6 +280,21 @@ const ScenePage: React.FC = () => {
           <span>{isSaved ? "Saved" : "Save Scene"}</span>
         </button>
       </div>
+      <SceneRenderer
+        fileData={fileData}
+        stickyNotes={stickyNotes}
+        selectedNoteId={selectedNoteId}
+        onSelectNote={(noteId) => {
+          if (noteId === selectedNoteId) {
+            // setSelectedNoteId(null);
+            setNoteContentOpened(true);
+          } else {
+            setSelectedNoteId(noteId);
+            setNoteContentOpened(false);
+          }
+        }}
+        onMoveNote={moveStickyNote}
+      />
       <div className="sticky-note-buttons flex flex-row gap-4">
         <button
           className="sticky-note-add scene-button"
@@ -349,22 +364,6 @@ const ScenePage: React.FC = () => {
             onDelete={deleteNote}
           />
         )}
-
-        <SceneRenderer
-          fileData={fileData}
-          stickyNotes={stickyNotes}
-          selectedNoteId={selectedNoteId}
-          onSelectNote={(noteId) => {
-            if (noteId === selectedNoteId) {
-              // setSelectedNoteId(null);
-              setNoteContentOpened(true);
-            } else {
-              setSelectedNoteId(noteId);
-              setNoteContentOpened(false);
-            }
-          }}
-          onMoveNote={moveStickyNote}
-        />
       </div>
     </div>
   );
