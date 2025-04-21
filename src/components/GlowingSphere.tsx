@@ -2,31 +2,61 @@ import React, { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-const GlowingSphere = ({
-  position = [0, 0, 0],
-  color = new THREE.Color(0xffa500),
-  scale = 0.2,
+interface GlowingSphereProps {
+  id: string;
+  position: [number, number, number];
+  content?: string;
+  imageUrl?: string;
+  isSelected: boolean;
+  onSelect: () => void;
+  onMove: (
+    id: string,
+    axis: "x" | "y" | "z",
+    direction: "positive" | "negative"
+  ) => void;
+  nextNotePosition?: [number, number, number];
+}
+
+const GlowingSphere: React.FC<GlowingSphereProps> = ({
+  id,
+  position,
+  content,
+  imageUrl,
+  isSelected,
+  onSelect,
+  onMove,
+  nextNotePosition,
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const timeRef = useRef(0);
 
   useFrame((_, delta) => {
     timeRef.current += delta;
-    const scaleFactor = scale + Math.sin(timeRef.current * 2) * 0.05;
+    const baseScale = 0.2;
+    const scaleFactor = baseScale + Math.sin(timeRef.current * 2) * 0.05;
     if (meshRef.current) {
       meshRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      meshRef.current.material.emissiveIntensity =
-        1.5 + Math.sin(timeRef.current * 3) * 0.5;
     }
   });
 
   return (
-    <mesh ref={meshRef} position={position}>
+    <mesh
+      ref={meshRef}
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
+    >
       <sphereGeometry args={[1, 32, 32]} />
       <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={2}
+        color={isSelected ? "#FFE100" : "#FF6200"}
+        transparent
+        opacity={0.9}
+        roughness={0.1}
+        metalness={0.1}
+        emissive={isSelected ? "#ffdf88" : "#FFAA00"}
+        emissiveIntensity={isSelected ? 5 : 2.6}
       />
     </mesh>
   );

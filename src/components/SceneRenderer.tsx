@@ -56,9 +56,8 @@ const StickyNotesContainer = React.memo(
             position={note.position}
             rotation={note.rotation}
           >
-            <StickyNote
+            <GlowingSphere
               id={note.id}
-              url="/models/envelop1.glb"
               position={note.position}
               content={note.content}
               imageUrl={note.imageUrl}
