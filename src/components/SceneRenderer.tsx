@@ -11,7 +11,8 @@ import {
   PointerEvents,
   IfInSessionMode,
 } from "@react-three/xr";
-
+import GlowingSphere from "./GlowingSphere";
+import { Note } from "../types";
 const store = createXRStore();
 
 const ModelRenderer = React.memo(({ url }: { url: string }) => {
@@ -30,8 +31,30 @@ interface StickyNoteData {
   imageUrl?: string;
 }
 
-interface Note extends StickyNoteData {
-  url?: string;
+interface StickyNoteData {
+  id: string;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  content: string;
+  imageUrl?: string;
+}
+
+interface StickyNoteProps {
+  id: string;
+  url: string;
+  position: [number, number, number];
+  content?: string;
+  imageUrl?: string;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+interface Note {
+  id: string;
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  content?: string;
+  imageUrl?: string;
 }
 
 const StickyNotesContainer = React.memo(
@@ -52,20 +75,20 @@ const StickyNotesContainer = React.memo(
             position={note.position}
             rotation={note.rotation}
           >
-            {" "}
-            <StickyNote
+            <GlowingSphere
               id={note.id}
-              url="/models/envelop1.glb"
+              position={note.position}
               position={note.position}
               content={note.content}
               imageUrl={note.imageUrl}
               isSelected={selectedNoteId === note.id}
               onSelect={() => onSelectNote(note.id)}
+              onMove={onMoveNote}
               nextNotePosition={
                 index < notes.length - 1 ? notes[index + 1].position : undefined
               }
+              breathRate={1 + Math.sin(index * 13.37) * 0.7}
             />
-            {/* <axesHelper args={[1]} /> */}
           </group>
         ))}
       </>
@@ -78,6 +101,7 @@ interface SceneRendererProps {
   stickyNotes: Note[];
   selectedNoteId: string | null;
   onSelectNote: (id: string) => void;
+  onAddNote: (note: Note) => void;
 }
 
 const SceneRenderer = React.memo(
@@ -86,6 +110,7 @@ const SceneRenderer = React.memo(
     stickyNotes,
     selectedNoteId,
     onSelectNote,
+    onAddNote,
   }: SceneRendererProps) => {
     //convert fileData to url
     const modelUrl = React.useMemo(() => {

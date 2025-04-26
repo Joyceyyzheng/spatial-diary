@@ -70,15 +70,19 @@ const StickyNoteControls: React.FC<StickyNoteControlsProps> = ({
       // } else {
       switch (event.key.toLowerCase()) {
         case "d":
+        case "arrowright":
           onMoveNote(selectedNoteId, "x", "positive");
           break;
         case "a":
+        case "arrowleft":
           onMoveNote(selectedNoteId, "x", "negative");
           break;
         case "w":
+        case "arrowup":
           onMoveNote(selectedNoteId, "y", "positive");
           break;
         case "s":
+        case "arrowdown":
           onMoveNote(selectedNoteId, "y", "negative");
           break;
         case "e":

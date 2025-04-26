@@ -22,6 +22,7 @@ import useStore from "../store";
 import HomeIcon from "../assets/home-icon.svg";
 import SaveIcon from "../assets/scene-save.svg";
 import AddIcon from "../assets/stickynote-add.svg";
+import AddDisabledIcon from "../assets/stickynote-add-disabled.svg";
 import ViewIcon from "../assets/stickynote-view.svg";
 import UploadIcon from "../assets/upload-icon.svg";
 import "./Scene.css";
@@ -44,6 +45,7 @@ const ScenePage: React.FC = () => {
   const [scene, setScene] = useState<{ id: string; name: string } | null>(null);
   const [sceneName, setSceneName] = useState<string>("");
   const [isXRMode, setIsXRMode] = useState(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadScene() {
@@ -79,17 +81,26 @@ const ScenePage: React.FC = () => {
               setFileName(model.fileName);
             }
           }
+          setIsSaved(true);
         }
       }
     }
     loadScene();
   }, [sceneId]);
 
+  // 监听场景名称变化
+  useEffect(() => {
+    if (scene && scene.name !== sceneName) {
+      setIsSaved(false);
+    }
+  }, [sceneName, scene]);
+
   const handleSaveScene = async () => {
     if (!sceneId) return;
     const newScene = { id: sceneId, name: sceneName || `Scene ${sceneId}` };
     await saveScene(newScene);
     setScene(newScene);
+    setIsSaved(true);
   };
 
   // Handle 3D model upload and data
@@ -137,18 +148,22 @@ const ScenePage: React.FC = () => {
   // add new sticky note
   const addStickyNote = async () => {
     if (!sceneId) return;
+    if (!fileData) {
+      alert("Add a 3D model first!");
+      return;
+    }
     const newNote: StickyNoteData = {
       id: uuidv4(),
       sceneId,
-      position: [0, 0, 0] as [number, number, number],
-      rotation: [0, 0, 0] as [number, number, number],
+      position: [0, 0, 0],
+      rotation: [0, 0, 0],
       entries: [],
     };
 
     const updatedNotes = [...stickyNotes, newNote];
     setStickyNotes(updatedNotes);
 
-    await saveStickyNote({ ...newNote, sceneId: sceneId });
+    await saveStickyNote(newNote);
     setSelectedNoteId(newNote.id);
   };
 
@@ -293,19 +308,33 @@ const ScenePage: React.FC = () => {
         />
         <button onClick={handleSaveScene} className="scene-button">
           <img src={SaveIcon} alt="save icon" />
-          <span>Save Scene</span>
+          <span>{isSaved ? "Saved" : "Save Scene"}</span>
         </button>
         {/* <button className="scene-button" onClick={() => setIsXRMode(!isXRMode)}>
           {isXRMode ? "Exit XR" : "Enter XR"}
         </button> */}
       </div>
+      <SceneRenderer
+        fileData={fileData}
+        stickyNotes={stickyNotes}
+        selectedNoteId={selectedNoteId}
+        onSelectNote={(noteId) => {
+          if (noteId === selectedNoteId) {
+            // setSelectedNoteId(null);
+            setNoteContentOpened(true);
+          } else {
+            setSelectedNoteId(noteId);
+            setNoteContentOpened(false);
+          }
+        }}
+        onMoveNote={moveStickyNote}
+      />
       <div className="sticky-note-buttons flex flex-row gap-4">
         <button
           className="sticky-note-add scene-button"
           onClick={addStickyNote}
         >
-          {" "}
-          <img src={AddIcon} alt="add icon" />
+          <img src={fileData ? AddIcon : AddDisabledIcon} alt="add icon" />
         </button>
         <button
           className="sticky-note-view scene-button"
@@ -316,7 +345,6 @@ const ScenePage: React.FC = () => {
             }
           }}
         >
-          {" "}
           <img src={ViewIcon} alt="view icon" />
         </button>
       </div>

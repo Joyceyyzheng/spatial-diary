@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getScenes, deleteScene, saveScene } from "../DB";
 import { useNavigate } from "react-router-dom";
 // import EarthView from "./EarthView";
@@ -14,6 +14,10 @@ import EnterIcon from "../assets/laptop-enter.svg";
 import InfoIcon from "../assets/info-gray.svg";
 import DeleteIcon from "../assets/delete-gray.svg";
 import SceneInfo from "./SceneInfo";
+import QuestionIcon from "../assets/question-mark.svg";
+import Instruction1 from "../assets/instruction1.png";
+import Instruction2 from "../assets/instruction2.png";
+import Instruction3 from "../assets/instruction3.png";
 import "./Home.css";
 
 interface Scene {
@@ -36,6 +40,9 @@ function Home() {
     x: number;
     y: number;
   } | null>(null);
+
+  const [showQuestion, setShowQuestion] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const loadScenes = async () => {
     const storedScenes = await getScenes();
@@ -122,11 +129,17 @@ function Home() {
     setShowInfo(true);
   };
 
+  const handleQuestion = () => {
+    setShowQuestion(!showQuestion);
+  };
+
   return (
     <div>
       <div className="flex flex-row justify-between">
         {" "}
-        <h1 className="my-2 text-left text-6xl font-bold">Spatial Diary</h1>
+        <h1 className="my-2 text-left text-6xl font-bold mb-5">
+          Spatial Diary
+        </h1>
         <div className="my-2 text-left  home-btns">
           <button
             className="home-add"
@@ -140,6 +153,78 @@ function Home() {
         </div>
       </div>
 
+      <button className="home-question" onClick={handleQuestion}>
+        <img src={QuestionIcon} alt="instruction" />
+      </button>
+
+      {showQuestion && (
+        <div
+          className="question-modal"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowQuestion(false);
+            }
+          }}
+        >
+          <div className="question-modal-content">
+            <button
+              onClick={() => setShowQuestion(false)}
+              className="close-button"
+            >
+              ×
+            </button>
+            <div className="question-modal-title">👋🏻</div>
+            <div className="question-modal-text">
+              {currentImageIndex === 0 && (
+                <img
+                  src={Instruction1}
+                  alt="Instruction 1"
+                  className="instruction-image"
+                />
+              )}
+              {currentImageIndex === 1 && (
+                <img
+                  src={Instruction2}
+                  alt="Instruction 2"
+                  className="instruction-image"
+                />
+              )}
+              {currentImageIndex === 2 && (
+                <img
+                  src={Instruction3}
+                  alt="Instruction 3"
+                  className="instruction-image"
+                />
+              )}
+              <div className="flex flex-row gap-2 justify-center items-center">
+                {currentImageIndex > 0 && (
+                  <button
+                    className="prev-button"
+                    onClick={() => {
+                      setCurrentImageIndex(currentImageIndex - 1);
+                    }}
+                  >
+                    Prev
+                  </button>
+                )}
+                <button
+                  className="next-button"
+                  onClick={() => {
+                    if (currentImageIndex < 2) {
+                      setCurrentImageIndex(currentImageIndex + 1);
+                    } else {
+                      setShowQuestion(false);
+                    }
+                  }}
+                >
+                  {currentImageIndex < 2 ? "Next" : "Done"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isList ? (
         <ul className="text-left w-full list-none list-view">
           {scenes.map((scene) => (
@@ -148,19 +233,19 @@ function Home() {
               className="scene-entry my-2 flex justify-between items-center cursor-pointer"
             >
               <div
-                className="list-info my-2 flex"
+                className="list-info my-2 flex justify-between items-center"
                 onClick={() => navigate(`/scene/${scene.id}`)}
               >
                 {" "}
-                <div className="list-info-name  flex flex-row items-center gap-2">
+                <div className="list-info-name  flex flex-row items-center gap-2 ">
                   <img src={EnterIcon} alt="enter icon" />
                   {scene.name}
                 </div>
-                <div className="list-info-time  flex flex-row items-center ">
+                <div className="list-info-time  flex flex-row items-center  ">
                   {new Date(parseInt(scene.id)).toLocaleDateString()}{" "}
                 </div>
               </div>
-              <div className="mx-2 flex gap-2">
+              <div className="mx-2 flex gap-2 button-container">
                 <button
                   className="home-info mx-0.5"
                   onClick={(e) => handleInfoClick(e, scene.id)}
