@@ -83,7 +83,7 @@ const StickyNotesContainer = React.memo(
               imageUrl={note.imageUrl}
               isSelected={selectedNoteId === note.id}
               onSelect={() => onSelectNote(note.id)}
-              onMove={onMoveNote}
+              // onMove={onMoveNote}
               nextNotePosition={
                 index < notes.length - 1 ? notes[index + 1].position : undefined
               }

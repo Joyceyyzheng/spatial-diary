@@ -398,41 +398,6 @@ const ScenePage: React.FC = () => {
             onDelete={deleteNote}
           />
         )}
-
-        {isXRMode ? (
-          <div className="xr-container">
-            {/* <XRButton mode="immersive-vr" /> */}
-            <Canvas>
-              <XR mode="immersive-vr">
-                <ambientLight intensity={0.5} />
-                <pointLight position={[10, 10, 10]} />
-                {fileData && (
-                  <primitive
-                    object={fileData}
-                    position={[0, 0, 0]}
-                    scale={[1, 1, 1]}
-                  />
-                )}
-              </XR>
-            </Canvas>
-          </div>
-        ) : (
-          <SceneRenderer
-            fileData={fileData}
-            stickyNotes={stickyNotes}
-            selectedNoteId={selectedNoteId}
-            onSelectNote={(noteId) => {
-              if (noteId === selectedNoteId) {
-                // setSelectedNoteId(null);
-                setNoteContentOpened(true);
-              } else {
-                setSelectedNoteId(noteId);
-                setNoteContentOpened(false);
-              }
-            }}
-            onMoveNote={moveStickyNote}
-          />
-        )}
       </div>
     </div>
   );
