@@ -52,34 +52,34 @@ const ScenePage: React.FC = () => {
         const storedScene = await getSceneById(sceneId);
         console.log("Stored scene:", storedScene);
 
-        // if (storedScene || sceneId === "predefined") {
-        //   setScene(storedScene ?? { id: "predefined", name: "Example" });
-        //   setSceneName(storedScene?.name ?? "Example");
+        if (storedScene || sceneId === "predefined") {
+          setScene(storedScene ?? { id: "predefined", name: "Example" });
+          setSceneName(storedScene?.name ?? "Example");
 
-        //   // 如果是预定义场景，加载预定义模型
-        //   if (sceneId === "predefined") {
-        //     try {
-        //       console.log("Loading predefined model...");
-        //       const response = await fetch("/models/livingroom.glb");
-        //       console.log("Model fetch response:", response.status);
-        //       if (!response.ok)
-        //         throw new Error(`HTTP error! status: ${response.status}`);
-        //       const model = await response.arrayBuffer();
-        //       console.log("Model loaded, size:", model.byteLength);
-        //       setFileData(model);
-        //       setFileName("livingroom.glb");
-        //     } catch (error) {
-        //       console.error("Error loading model:", error);
-        //     }
-        //   } else {
-        //     // 对于其他场景，尝试加载保存的模型
-        //     const model = await getModel(sceneId);
-        //     if (model) {
-        //       setFileData(model.model);
-        //       setFileName(model.fileName);
-        //     }
-        //   }
-        // }
+          // 如果是预定义场景，加载预定义模型
+          if (sceneId === "predefined") {
+            try {
+              console.log("Loading predefined model...");
+              const response = await fetch("/models/livingroom.glb");
+              console.log("Model fetch response:", response.status);
+              if (!response.ok)
+                throw new Error(`HTTP error! status: ${response.status}`);
+              const model = await response.arrayBuffer();
+              console.log("Model loaded, size:", model.byteLength);
+              setFileData(model);
+              setFileName("livingroom.glb");
+            } catch (error) {
+              console.error("Error loading model:", error);
+            }
+          } else {
+            // 对于其他场景，尝试加载保存的模型
+            const model = await getModel(sceneId);
+            if (model) {
+              setFileData(model.model);
+              setFileName(model.fileName);
+            }
+          }
+        }
       }
     }
     loadScene();

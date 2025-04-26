@@ -37,14 +37,19 @@
   font-size: 16px;
   font-weight: 600;
   transition: background-color 0.3s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.xr-buttons button:hover {
+/* .xr-buttons button:hover {
   background-color: #357abd;
-}
+} */
 
 .xr-buttons button:active {
-  background-color: #2c6da3;
+  background-color: black;
+  color: var(--beige);
 }
 
 .xr-error {

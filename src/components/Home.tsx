@@ -67,7 +67,7 @@ function Home() {
     const refreshedScenes = await getScenes();
 
     setScenes([
-      // predefinedScene,
+      predefinedScene,
       ...refreshedScenes.filter((scene) => scene.id !== "predefined"),
     ]);
   };
