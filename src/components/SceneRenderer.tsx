@@ -118,9 +118,9 @@ const SceneRenderer = React.memo(
     return (
       <>
         {" "}
-        {/* <div className="xr-buttons">
+        <div className="xr-buttons">
           <button onClick={() => store.enterVR()}>Enter VR</button>
-        </div> */}
+        </div>
         {/* {!modelsLoaded && <div className="loading-overlay">加载中...</div>} */}
         <Canvas
           style={{
@@ -132,39 +132,40 @@ const SceneRenderer = React.memo(
           }}
           events={noEvents}
         >
-          {/* <XR store={store}> */}
-          <Suspense fallback={null}>
-            <ambientLight intensity={0.1} />
-            {/* <IfInSessionMode deny={["immersive-ar", "immersive-vr"]}> */}
-            <OrbitControls
-              maxDistance={6}
-              minDistance={0.1}
-              // target={[0, 0, 0]}
-              // position={[-2, -2, -2]}
-              // enableDamping={true}
-              // dampingFactor={0.05}
-            />
-            {/* </IfInSessionMode> */}
-            <PointerEvents />
-            {modelUrl && (
-              <>
-                <group position={[0, -1, 0]}>
-                  {/* vr test y=1.3 */}
-                  <ModelRenderer url={modelUrl} />
-                </group>
-                {/* <mesh>
+          <XR store={store}>
+            <Suspense fallback={null}>
+              <ambientLight intensity={0.1} />
+              {/* <IfInSessionMode deny={["immersive-ar", "immersive-vr"]}> */}
+              <OrbitControls
+                maxDistance={6}
+                minDistance={0.1}
+                // target={[0, 0, 0]}
+                // position={[-2, -2, -2]}
+                // enableDamping={true}
+                // dampingFactor={0.05}
+              />
+              {/* </IfInSessionMode> */}
+              <PointerEvents />
+              {modelUrl && (
+                <>
+                  <group position={[0, 1.3, 0]}>
+                    {/* vr test y=1.3 */}
+                    {/*regular y=-1 */}
+                    <ModelRenderer url={modelUrl} />
+                  </group>
+                  {/* <mesh>
                     <boxGeometry args={[1, 1, 1]} />
                     <meshBasicMaterial color="red" />
                   </mesh> */}
-              </>
-            )}
-            <StickyNotesContainer
-              notes={stickyNotes}
-              selectedNoteId={selectedNoteId}
-              onSelectNote={onSelectNote}
-            />
-          </Suspense>
-          {/* </XR> */}
+                </>
+              )}
+              <StickyNotesContainer
+                notes={stickyNotes}
+                selectedNoteId={selectedNoteId}
+                onSelectNote={onSelectNote}
+              />
+            </Suspense>
+          </XR>
         </Canvas>
       </>
     );
