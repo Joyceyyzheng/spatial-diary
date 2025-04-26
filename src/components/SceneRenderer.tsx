@@ -67,6 +67,7 @@ const StickyNotesContainer = React.memo(
               nextNotePosition={
                 index < notes.length - 1 ? notes[index + 1].position : undefined
               }
+              breathRate={1 + Math.sin(index * 13.37) * 0.7}
             />
           </group>
         ))}

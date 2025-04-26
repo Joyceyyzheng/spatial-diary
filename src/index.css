@@ -130,7 +130,14 @@ button:active,
   top: 3%;
   position: absolute;
   right: 5%;
-  gap: 2rem;
+  gap: 3rem;
+  width: 25%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  /* margin-bottom: 0.5rem; */
 }
 
 .scene-name-input {
@@ -228,6 +235,8 @@ button:active,
 
   .sticky-note-buttons {
     position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     bottom: 3%;
     top: auto;
     width: 95vw;

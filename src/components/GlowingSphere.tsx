@@ -15,6 +15,7 @@ interface GlowingSphereProps {
     direction: "positive" | "negative"
   ) => void;
   nextNotePosition?: [number, number, number];
+  breathRate?: number;
 }
 
 const GlowingSphere: React.FC<GlowingSphereProps> = ({
@@ -26,14 +27,16 @@ const GlowingSphere: React.FC<GlowingSphereProps> = ({
   onSelect,
   onMove,
   nextNotePosition,
+  breathRate,
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const timeRef = useRef(0);
 
   useFrame((_, delta) => {
     timeRef.current += delta;
-    const baseScale = 0.2;
-    const scaleFactor = baseScale + Math.sin(timeRef.current * 2) * 0.05;
+    const baseScale = 0.1;
+    const scaleFactor =
+      baseScale + Math.sin(timeRef.current * (breathRate ?? 1.5)) * 0.05;
     if (meshRef.current) {
       meshRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
     }
@@ -50,13 +53,13 @@ const GlowingSphere: React.FC<GlowingSphereProps> = ({
     >
       <sphereGeometry args={[1, 32, 32]} />
       <meshStandardMaterial
-        color={isSelected ? "#FFE100" : "#FF6200"}
+        color={isSelected ? "#72E949" : "#FF6200"}
         transparent
         opacity={0.9}
         roughness={0.1}
         metalness={0.1}
-        emissive={isSelected ? "#ffdf88" : "#FFAA00"}
-        emissiveIntensity={isSelected ? 5 : 2.6}
+        emissive={isSelected ? "#2BA700" : "#FFAA00"}
+        emissiveIntensity={isSelected ? 3 : 2.6}
       />
     </mesh>
   );

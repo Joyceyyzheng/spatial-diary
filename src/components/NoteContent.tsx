@@ -233,8 +233,8 @@ const NoteContent: React.FC<NoteContentProps> = ({
 
           <div className="note-history">
             {entries && entries.length > 0 ? (
-              [...entries].reverse().map((entry, index) => (
-                <div key={entry.id} className="note-entry">
+              entries.map((entry, index) => (
+                <div key={entry.id || `entry-${index}`} className="note-entry">
                   <div className="note-entry-header">
                     <span className="note-entry-time">
                       {new Date(entry.timestamp).toLocaleString("zh-CN", {
@@ -250,6 +250,7 @@ const NoteContent: React.FC<NoteContentProps> = ({
 
                   {entry.imageUrl && entry.imageUrl !== "" && (
                     <img
+                      key={`image-${entry.id}`}
                       src={entry.imageUrl}
                       alt={`Note ${index + 1}`}
                       style={{ maxWidth: "100%", marginTop: "10px" }}
@@ -272,6 +273,7 @@ const NoteContent: React.FC<NoteContentProps> = ({
                           {entry.audioName || "Audio"}
                         </button>
                         <audio
+                          key={`audio-${entry.id}`}
                           ref={(el) => (audioRefs.current[entry.id] = el)}
                           src={entry.audioUrl}
                           onEnded={() =>
