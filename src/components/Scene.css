@@ -41,11 +41,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.xr-buttons button:hover {
-  /* background-color: #357abd; */
-}
+/* .xr-buttons button:hover {
+  background-color: #357abd;
+} */
 
 .xr-buttons button:active {
   background-color: black;

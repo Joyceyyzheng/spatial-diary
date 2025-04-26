@@ -148,6 +148,28 @@ const SceneRenderer = React.memo(
               <PointerEvents />
               {modelUrl && (
                 <>
+                  <group position={[0, 1.2, 0]}>
+                    {/* vr test y=1.3 */}
+                    {/* regular y=-1 */}
+                    <ModelRenderer url={modelUrl} />
+                  </group>
+                  {/* <mesh>
+          <XR store={store}>
+            <Suspense fallback={null}>
+              <ambientLight intensity={0.1} />
+              {/* <IfInSessionMode deny={["immersive-ar", "immersive-vr"]}> */}
+              <OrbitControls
+                maxDistance={6}
+                minDistance={0.1}
+                // target={[0, 0, 0]}
+                // position={[-2, -2, -2]}
+                // enableDamping={true}
+                // dampingFactor={0.05}
+              />
+              {/* </IfInSessionMode> */}
+              <PointerEvents />
+              {modelUrl && (
+                <>
                   <group position={[0, 1.3, 0]}>
                     {/* vr test y=1.3 */}
                     {/*regular y=-1 */}
@@ -157,6 +179,15 @@ const SceneRenderer = React.memo(
                     <boxGeometry args={[1, 1, 1]} />
                     <meshBasicMaterial color="red" />
                   </mesh> */}
+                </>
+              )}
+              <StickyNotesContainer
+                notes={stickyNotes}
+                selectedNoteId={selectedNoteId}
+                onSelectNote={onSelectNote}
+              />
+            </Suspense>
+          </XR>
                 </>
               )}
               <StickyNotesContainer
