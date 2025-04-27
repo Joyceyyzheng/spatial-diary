@@ -10,8 +10,8 @@ import SceneInfo from "./SceneInfo";
 
 // 修改图标路径
 let DefaultIcon = L.icon({
-  iconUrl: "/leaflet/marker-icon.png",
-  iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+  iconUrl: "/leaflet/leafletlogo.svg",
+  iconRetinaUrl: "/leaflet/leafletlogo.svg",
   shadowUrl: "/leaflet/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
